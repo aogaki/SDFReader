@@ -2,6 +2,7 @@
 #define TSDFREADER 1
 
 #include <fstream>
+#include <vector>
 
 #include <TString.h>
 
@@ -11,7 +12,7 @@ const Int_t kSDFVersion = 1;
 const Int_t kSDFRevision = 1;
 
 const Int_t kBlockTypeOffset = 56;
-const Int_t kMaxBlock = 1024; // Enough?
+
 
 class TSDFReader
 {
@@ -19,24 +20,19 @@ public:
    TSDFReader(TString fileName = "0300.sdf");
    virtual ~TSDFReader();
 
-   Int_t GetJobID1() {return fJobID1;};
-   Int_t GetJobID2() {return fJobID2;};
    Int_t GetNBlocks() {return fNBlocks;};
    
-   void ReadBlockHeader();
-   void ReadBlockMetadata();
-   void ReadBlockData();
-   void GoNextBlock();
+   TSDFBlock *GetBlock(Int_t i){return fBlock[i];};
+
+   std::vector<TSDFBlock *> fBlock;
    
 private:
+   void LoadBlocks();
    Int_t GetNextBlockType();
    
    TString fFileName;
    std::ifstream *fInputFile;
 
-   Int_t fBlockIndex;
-   TSDFBlock *fBlock[kMaxBlock];
-   
    void ReadFileHeader();
    Int_t fJobID1;
    Int_t fJobID2;

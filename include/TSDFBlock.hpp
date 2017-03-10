@@ -16,12 +16,20 @@ public:
    virtual Long_t GetNextLocation() {return fNextLocation;};
    
    virtual void ReadHeader();
+   virtual void PrintHeader();
+
    virtual void ReadMetadata();
+   virtual void PrintMetadata();
+
    virtual void ReadData();
+
+   Int_t GetDataSize(){return fDataSize;};
+
+   TString GetName(){return TString(fBlockName);};
+   TString GetID(){return TString(fBlockID);};
    
 protected:
    // For header and general information
-   void PrintHeader();
    std::ifstream *fInputFile;
    Long_t fBlockLocation;
    Long_t fMetadataLocation;
@@ -38,8 +46,7 @@ protected:
    Int_t fHeaderLength;
    Int_t fStringLength;
 
-   virtual void PrintMetadata();
-
+   Int_t fDataSize;
 };
 
 #endif

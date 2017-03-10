@@ -9,7 +9,9 @@
 
 
 TSDFBlock::TSDFBlock()
-{}
+{
+   fDataSize = 0;
+}
 
 TSDFBlock::TSDFBlock(std::ifstream *file, Long_t location,
                      Int_t stringLength, Int_t headerLength)
@@ -18,6 +20,10 @@ TSDFBlock::TSDFBlock(std::ifstream *file, Long_t location,
    fBlockLocation = location;
    fStringLength = stringLength;
    fHeaderLength = headerLength;
+
+   fDataSize = 0;
+   
+   ReadHeader();
 }
 
 TSDFBlock::~TSDFBlock()
@@ -35,8 +41,6 @@ void TSDFBlock::ReadHeader()
    fInputFile->read((Char_t *)&fNDims, sizeof(fNDims));
    fInputFile->read(fBlockName, sizeof(Char_t) * fStringLength);
    fInputFile->read((Char_t *)&fBlockInfoLength, sizeof(fBlockInfoLength));
-
-   PrintHeader();
 }
 
 void TSDFBlock::PrintHeader()

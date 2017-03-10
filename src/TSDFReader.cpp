@@ -5,6 +5,8 @@
 
 #include <iostream>
 
+#include <TString.h>
+
 #include "TSDFReader.hpp"
 #include "TSDFBlock.hpp"
 #include "TSDFBlockPlainVar.hpp"
@@ -20,14 +22,9 @@ TSDFReader::TSDFReader(TString fileName)
    }
 
    ReadFileHeader();
-   if(fNBlocks > kMaxBlock) {
-      std::cerr << "Enlarge the kMaxBlock!" << std::endl;
-      exit(0);
-   }
+
+   LoadBlocks();
    
-   fBlockIndex = 0;
-   fBlock[fBlockIndex] = new TSDFBlock(fInputFile, fNextBlockLocation,
-                                       fStringLength, fBlockHeaderLength);
 }
 
 TSDFReader::~TSDFReader()
@@ -40,7 +37,7 @@ void TSDFReader::ReadFileHeader()
    Char_t sdf[5];
    fInputFile->read(sdf, sizeof(Char_t) * 4);
    std::cout << "sdf = " << sdf << std::endl;
-   if(strcmp(sdf, "SDF1")) {
+   if(TString(sdf) != "SDF1") {
       std::cerr << "file " << fFileName << " is not SDF file" << std::endl;
       exit(0);
    }
@@ -109,7 +106,7 @@ void TSDFReader::ReadFileHeader()
    std::cout << "jobid1 = " << fJobID1 << std::endl;
 
    fInputFile->read((Char_t *)(&fJobID2), sizeof(fJobID2));
-   std::cout << "jobid1 = " << fJobID2 << std::endl;
+   std::cout << "jobid2 = " << fJobID2 << std::endl;
 
    fInputFile->read((Char_t *)(&fStringLength), sizeof(fStringLength));
    std::cout << "string_length = " << fStringLength << std::endl;
@@ -127,28 +124,40 @@ void TSDFReader::ReadFileHeader()
    std::cout << "subdomain_file = " << Int_t(subdomain_file) << std::endl;
 }
 
-void TSDFReader::ReadBlockHeader()
-{
-   fBlock[fBlockIndex]->ReadHeader();
-}
+void TSDFReader::LoadBlocks(){
 
-void TSDFReader::ReadBlockMetadata()
-{
-   fBlock[fBlockIndex]->ReadMetadata();
-}
+   // Load run_info block
+   fBlock.push_back(new TSDFBlock(fInputFile, fNextBlockLocation,
+                                  fStringLength, fBlockHeaderLength));
 
-void TSDFReader::ReadBlockData()
-{
-   fBlock[fBlockIndex]->ReadData();
-}
-
-void TSDFReader::GoNextBlock()
-{
-   fNextBlockLocation = fBlock[fBlockIndex]->GetNextLocation();
-   Int_t blockType = GetNextBlockType();
+   for(Int_t i = 0; i < fNBlocks - 1; i++){ // push_back means adding to (i + 1)
+      fNextBlockLocation = fBlock[i]->GetNextLocation();
+      Int_t blockType = GetNextBlockType();
+      switch(blockType){
+         case c_blocktype_plain_variable:
+            fBlock.push_back(new TSDFBlockPlainVar(fInputFile, fNextBlockLocation,
+                                                   fStringLength, fBlockHeaderLength));
+            //fBlock[i + 1]->PrintHeader();
+            fBlock[i + 1]->ReadMetadata();
+            //fBlock[i + 1]->PrintMetadata();
+            fBlock[i + 1]->ReadData();
+            //goto stopTest;
+            break;
+         case c_blocktype_run_info:
+            fBlock.push_back(new TSDFBlock(fInputFile, fNextBlockLocation,
+                                           fStringLength, fBlockHeaderLength));
+            break;
+         default:
+            fBlock.push_back(new TSDFBlock(fInputFile, fNextBlockLocation,
+                                           fStringLength, fBlockHeaderLength));
+            //fBlock[i + 1]->PrintHeader();
+            break;
+      }
+   }
    
-   fBlockIndex++;
-
+stopTest:
+   std::cout << "stop test" << std::endl;
+/*
    switch(blockType){
       case c_blocktype_scrubbed:
          break;
@@ -159,7 +168,7 @@ void TSDFReader::GoNextBlock()
       case c_blocktype_point_mesh:
          break;
       case c_blocktype_plain_variable:
-         fBlock[fBlockIndex] = new TSDFBlockPlainVar(fInputFile, fNextBlockLocation,
+         fBlock[i] = new TSDFBlockPlainVar(fInputFile, fNextBlockLocation,
                                                      fStringLength, fBlockHeaderLength);
          break;
       case c_blocktype_point_variable:
@@ -169,7 +178,7 @@ void TSDFReader::GoNextBlock()
       case c_blocktype_array:
          break;
       case c_blocktype_run_info:
-         fBlock[fBlockIndex] = new TSDFBlock(fInputFile, fNextBlockLocation,
+         fBlock[i] = new TSDFBlock(fInputFile, fNextBlockLocation,
                                              fStringLength, fBlockHeaderLength);
          break;
       case c_blocktype_source:
@@ -185,10 +194,11 @@ void TSDFReader::GoNextBlock()
       case c_blocktype_species:
          break;
       default:
-         fBlock[fBlockIndex] = new TSDFBlock(fInputFile, fNextBlockLocation,
+         fBlock[i] = new TSDFBlock(fInputFile, fNextBlockLocation,
                                              fStringLength, fBlockHeaderLength);
          break;
    }
+*/
 }
 
 Int_t TSDFReader::GetNextBlockType()
@@ -197,7 +207,6 @@ Int_t TSDFReader::GetNextBlockType()
    fInputFile->seekg(fNextBlockLocation + kBlockTypeOffset,
                      std::ios::beg);
    fInputFile->read((Char_t *)&blockType, sizeof(blockType));
-   std::cout << "blockType = " << blockType << std::endl;
 
    return blockType;
 }
