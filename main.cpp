@@ -5,12 +5,13 @@
 
 int main(int argc, char **argv)
 {
-   TString fileName = "Data/0300.sdf";
+   TString fileName = "Data/0010.sdf";
    TSDFReader *reader = new TSDFReader(fileName);
 
    for(auto block: reader->fBlock){
-      //if(block->GetDataSize() > 0.)
-         std::cout << block->GetName() <<"\t"
+         std::cout << block->GetBlockType() <<"\t"
+                   << block->GetDataType() <<"\t"
+                   << block->GetName() <<"\t"
                    << block->GetID() <<"\t"
                    << std::endl;
    }

@@ -27,6 +27,8 @@ public:
 
    TString GetName(){return TString(fBlockName);};
    TString GetID(){return TString(fBlockID);};
+   Int_t GetBlockType(){return fBlockType;};
+   Int_t GetDataType(){return fDataType;};
    
 protected:
    // For header and general information

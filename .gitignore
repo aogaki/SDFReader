@@ -1,6 +1,9 @@
 CMakeCache.txt
 CMakeFiles/
 Data/
+1D/
+2D/
+3D/
 cmake_install.cmake
 SDFReader
 Makefile
