@@ -1,5 +1,5 @@
-#ifndef TSDFBLOCKPLAINMESH
-#define TSDFBLOCKPLAINMESH 1
+#ifndef TSDFBLOCKPOINTMESH
+#define TSDFBLOCKPOINTMESH 1
 
 #include <fstream>
 #include <vector>
@@ -9,10 +9,10 @@
 #include "TSDFBlock.hpp"
 
 
-class TSDFBlockPlainMesh: public TSDFBlock
+class TSDFBlockPointMesh: public TSDFBlock
 {
 public:
-   TSDFBlockPlainMesh(std::ifstream *, Long_t, Int_t, Int_t);
+   TSDFBlockPointMesh(std::ifstream *, Long_t, Int_t, Int_t);
    
    void ReadMetadata();
    void PrintMetadata();
@@ -24,7 +24,7 @@ private:
    Int_t fGeoType;
    Double_t fMinVal[3];
    Double_t fMaxVal[3];
-   Int_t fNGrids[3];
+   Long64_t fNParticles;
    
 };
 

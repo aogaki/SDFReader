@@ -11,6 +11,7 @@
 #include "TSDFBlock.hpp"
 #include "TSDFBlockPlainMesh.hpp"
 #include "TSDFBlockPlainVar.hpp"
+#include "TSDFBlockPointMesh.hpp"
 
 
 using std::cout;
@@ -38,7 +39,7 @@ TSDFReader::~TSDFReader()
 
 void TSDFReader::ReadFileHeader()
 {
-   Char_t sdf[5];
+   Char_t sdf[4];
    fInputFile->read(sdf, sizeof(Char_t) * 4);
    cout << "sdf = " << sdf << endl;
    if(TString(sdf) != "SDF1") {
@@ -58,7 +59,7 @@ void TSDFReader::ReadFileHeader()
    fInputFile->read((Char_t *)(&sdf_version), sizeof(sdf_version));
    cout << "sdf_version = " << sdf_version << endl;
    if(sdf_version > kSDFVersion) {
-      std::cerr << "The version of file is newer than this reader. The reader version = "
+      std::cerr << "The version of file has to be newer than this reader. The reader version = "
            << kSDFVersion << endl;
       exit(0);
    }
@@ -71,7 +72,7 @@ void TSDFReader::ReadFileHeader()
            << kSDFRevision << endl;
    }
 
-   Char_t code_name[33];
+   Char_t code_name[32];
    fInputFile->read(code_name, sizeof(Char_t) * 32);
    cout << "code_name = " << code_name << endl;
    
@@ -142,36 +143,25 @@ void TSDFReader::LoadBlocks(){
             fBlock.push_back(new TSDFBlockPlainMesh(fInputFile, fNextBlockLocation,
                                                     fStringLength, fBlockHeaderLength));
             fBlock[i + 1]->ReadMetadata();
-            fBlock[i + 1]->ReadData();
-            //fBlock[i + 1]->PrintHeader();
-            //fBlock[i + 1]->PrintMetadata();
-            //fBlock[i + 1]->PrintData();
-            //goto stopTest;
             break;
          case c_blocktype_plain_variable:
             fBlock.push_back(new TSDFBlockPlainVar(fInputFile, fNextBlockLocation,
                                                    fStringLength, fBlockHeaderLength));
             fBlock[i + 1]->ReadMetadata();
-            fBlock[i + 1]->ReadData();
-            fBlock[i + 1]->PrintHeader();
-            fBlock[i + 1]->PrintMetadata();
-            fBlock[i + 1]->PrintData();
-            //goto stopTest;
             break;
          case c_blocktype_run_info:
             fBlock.push_back(new TSDFBlock(fInputFile, fNextBlockLocation,
                                            fStringLength, fBlockHeaderLength));
+            fBlock[i + 1]->ReadMetadata();
             break;
          default:
             fBlock.push_back(new TSDFBlock(fInputFile, fNextBlockLocation,
                                            fStringLength, fBlockHeaderLength));
-            fBlock[i + 1]->PrintHeader();
+            fBlock[i + 1]->ReadMetadata();
             break;
       }
    }
-   
-stopTest:
-   cout << "stop test" << endl;
+
 /*
    switch(blockType){
       case c_blocktype_scrubbed:

@@ -21,8 +21,8 @@ public:
    virtual void ReadMetadata(){};
    virtual void PrintMetadata(){};
 
-   virtual void ReadData(){};
-   virtual void PrintData(){};
+   virtual void ReadData();
+   virtual void PrintData(){for(auto v: fData) std::cout << v << std::endl;};
 
    Int_t GetDataSize(){return fDataSize;};
 
@@ -50,6 +50,10 @@ protected:
    Int_t fStringLength;
 
    Int_t fDataSize;
+
+   void ReadData64();
+   void ReadData32();
+   std::vector<Double_t> fData;
 };
 
 #endif

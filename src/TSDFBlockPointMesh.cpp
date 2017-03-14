@@ -5,13 +5,13 @@
 #include <iostream>
 
 #include "TSDFReader.hpp"
-#include "TSDFBlockPlainMesh.hpp"
+#include "TSDFBlockPointMesh.hpp"
 
 
 using std::cout;
 using std::endl;
 
-TSDFBlockPlainMesh::TSDFBlockPlainMesh(std::ifstream *file, Long_t location,
+TSDFBlockPointMesh::TSDFBlockPointMesh(std::ifstream *file, Long_t location,
                                        Int_t stringLength, Int_t headerLength)
    :TSDFBlock()
 {
@@ -24,19 +24,19 @@ TSDFBlockPlainMesh::TSDFBlockPlainMesh(std::ifstream *file, Long_t location,
    fDataSize = 0;
 
    fGeoType = 0;
+   fNParticles = 0;
    for(Int_t i = 0; i < 3; i++){// These have 3 dimensions
       fNormFactor[i] = 0.;
       fAxisLabel[i] = "";
       fUnits[i] = "";
       fMinVal[i] = 0.;
       fMaxVal[i] = 0.;
-      fNGrids[i] = 0;
    }
    
    ReadHeader();
 }
 
-void TSDFBlockPlainMesh::ReadMetadata()
+void TSDFBlockPointMesh::ReadMetadata()
 {
    fInputFile->seekg(fMetadataLocation, std::ios::beg);
    fInputFile->read((Char_t *)fNormFactor, sizeof(Double_t) * fNDims);
@@ -55,10 +55,10 @@ void TSDFBlockPlainMesh::ReadMetadata()
    fInputFile->read((Char_t *)&fGeoType, sizeof(Int_t));
    fInputFile->read((Char_t *)fMinVal, sizeof(Double_t) * fNDims);
    fInputFile->read((Char_t *)fMaxVal, sizeof(Double_t) * fNDims);
-   fInputFile->read((Char_t *)fNGrids, sizeof(Int_t) * fNDims);
+   fInputFile->read((Char_t *)fNParticles, sizeof(Long64_t));
 }
 
-void TSDFBlockPlainMesh::PrintMetadata()
+void TSDFBlockPointMesh::PrintMetadata()
 {
    cout << "Normalization factor: "
         << fNormFactor[0] <<"\t"
@@ -81,8 +81,5 @@ void TSDFBlockPlainMesh::PrintMetadata()
         << fMaxVal[0] <<"\t"
         << fMaxVal[1] <<"\t"
         << fMaxVal[2] << endl;
-   cout << "No. Grids: "
-        << fNGrids[0] <<"\t"
-        << fNGrids[1] <<"\t"
-        << fNGrids[2] << endl;
+   cout << "No. Particles: " << fNParticles << endl;
 }

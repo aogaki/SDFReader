@@ -93,3 +93,39 @@ void TSDFBlock::PrintHeader()
         << "block_info_length = " << fBlockInfoLength <<"\n"
         << "next_block_location = " << fNextLocation << endl;
 }
+
+void TSDFBlock::ReadData()
+{
+   fInputFile->seekg(fDataLocation, std::ios::beg);
+
+   if(fDataType == 4) ReadData64();
+   else if(fDataType == 3) ReadData32();
+   else{
+      cout << "DataType error in ReadData@BlockPlaneMesh" << endl;
+      cout << "Now, only double and float data types are implemented" << endl;
+      exit(0);
+   }
+}
+
+void TSDFBlock::ReadData64()
+{
+   Double_t buf;
+   fDataSize = fDataLength / 8;
+
+   for(Int_t i = 0; i < fDataSize; i++){
+      fInputFile->read((Char_t *)&buf, sizeof(buf));
+      fData.push_back(buf);
+   }
+}
+
+void TSDFBlock::ReadData32()
+{
+   Float_t buf;
+   fDataSize = fDataLength / 4;
+
+   for(Int_t i = 0; i < fDataSize; i++){
+      fInputFile->read((Char_t *)&buf, sizeof(buf));
+      fData.push_back(Double_t(buf));
+   }
+}
+

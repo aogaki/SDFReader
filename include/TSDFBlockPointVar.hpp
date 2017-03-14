@@ -1,5 +1,5 @@
-#ifndef TSDFBLOCKPLAINVAR
-#define TSDFBLOCKPLAINVAR 1
+#ifndef TSDFBLOCKPOINTVAR
+#define TSDFBLOCKPOINTVAR 1
 
 #include <fstream>
 #include <vector>
@@ -9,10 +9,10 @@
 #include "TSDFBlock.hpp"
 
 
-class TSDFBlockPlainVar: public TSDFBlock
+class TSDFBlockPointVar: public TSDFBlock
 {
 public:
-   TSDFBlockPlainVar(std::ifstream *, Long_t, Int_t, Int_t);
+   TSDFBlockPointVar(std::ifstream *, Long_t, Int_t, Int_t);
       
    void ReadMetadata();
    void PrintMetadata();
@@ -21,8 +21,7 @@ private:
    Double_t fNormFactor;
    TString fUnits;
    TString fMeshID;
-   Int_t fNGrids[3];
-   Int_t fStagger;
+   Long64_t fNParticles;
 };
 
 #endif
