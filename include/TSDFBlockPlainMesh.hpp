@@ -1,5 +1,5 @@
-#ifndef TSDFBLOCKPLAINVAR
-#define TSDFBLOCKPLAINVAR 1
+#ifndef TSDFBLOCKPLAINMESH
+#define TSDFBLOCKPLAINMESH 1
 
 #include <fstream>
 #include <vector>
@@ -9,11 +9,11 @@
 #include "TSDFBlock.hpp"
 
 
-class TSDFBlockPlainVar: public TSDFBlock
+class TSDFBlockPlainMesh: public TSDFBlock
 {
 public:
-   TSDFBlockPlainVar(std::ifstream *, Long_t, Int_t, Int_t);
-      
+   TSDFBlockPlainMesh(std::ifstream *, Long_t, Int_t, Int_t);
+   
    void ReadMetadata();
    void PrintMetadata();
 
@@ -23,12 +23,14 @@ public:
    void PrintData(){for(auto v: fData) std::cout << v << std::endl;};
    
 private:
-   Double_t fNormFactor;
-   TString fUnits;
-   TString fMeshID;
+   Double_t fNormFactor[3];
+   TString fAxisLabel[3];
+   TString fUnits[3];
+   Int_t fGeoType;
+   Double_t fMinVal[3];
+   Double_t fMaxVal[3];
    Int_t fNGrid[3];
-   Int_t fStagger;
-
+   
    void ReadData64();
    void ReadData32();
    std::vector<Double_t> fData;

@@ -18,15 +18,16 @@ public:
    virtual void ReadHeader();
    virtual void PrintHeader();
 
-   virtual void ReadMetadata();
-   virtual void PrintMetadata();
+   virtual void ReadMetadata(){};
+   virtual void PrintMetadata(){};
 
-   virtual void ReadData();
+   virtual void ReadData(){};
+   virtual void PrintData(){};
 
    Int_t GetDataSize(){return fDataSize;};
 
-   TString GetName(){return TString(fBlockName);};
-   TString GetID(){return TString(fBlockID);};
+   TString GetName(){return fBlockName;};
+   TString GetID(){return fBlockID;};
    Int_t GetBlockType(){return fBlockType;};
    Int_t GetDataType(){return fDataType;};
    
@@ -37,12 +38,12 @@ protected:
    Long_t fMetadataLocation;
    Long_t fDataLocation;
    Long_t fNextLocation;
-   Char_t fBlockID[33];
+   TString fBlockID;
    Long_t fDataLength;
    Int_t fBlockType;
    Int_t fDataType;
    Int_t fNDims;
-   Char_t fBlockName[256];
+   TString fBlockName;
    Int_t fBlockInfoLength;
    
    Int_t fHeaderLength;

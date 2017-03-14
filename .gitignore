@@ -1,11 +1,11 @@
 CMakeCache.txt
 CMakeFiles/
-Data/
+Data
 1D/
 2D/
 3D/
 cmake_install.cmake
-SDFReader
+sdf2root
 Makefile
 *.pcm
 *.so
