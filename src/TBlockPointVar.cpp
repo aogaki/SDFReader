@@ -4,16 +4,15 @@
 
 #include <iostream>
 
-#include "TSDFReader.hpp"
-#include "TSDFBlockPlainVar.hpp"
+#include "TBlockPointVar.hpp"
 
 
 using std::cout;
 using std::endl;
 
-TSDFBlockPlainVar::TSDFBlockPlainVar(std::ifstream *file, Long_t location,
+TBlockPointVar::TBlockPointVar(std::ifstream *file, Long_t location,
                                      Int_t stringLength, Int_t headerLength)
-   :TSDFBlock()
+   :TBlock()
 {
    fInputFile = file;
    fBlockLocation = location;
@@ -24,15 +23,14 @@ TSDFBlockPlainVar::TSDFBlockPlainVar(std::ifstream *file, Long_t location,
    fNormFactor = 0.;
    fUnits = "";
    fMeshID = "";
-   fNGrids[0] = fNGrids[1] = fNGrids[2] =  0;
-   fStagger = -1;
+   fNParticles =  0;
 
    fDataSize = 0;
    
    ReadHeader();
 }
 
-void TSDFBlockPlainVar::ReadMetadata()
+void TBlockPointVar::ReadMetadata()
 {
    fInputFile->seekg(fMetadataLocation, std::ios::beg);
    fInputFile->read((Char_t *)&fNormFactor, sizeof(fNormFactor));
@@ -43,18 +41,13 @@ void TSDFBlockPlainVar::ReadMetadata()
    fInputFile->read(buf, sizeof(Char_t) * charSize);
    fMeshID = buf;
    delete buf;
-   fInputFile->read((Char_t *)fNGrids, sizeof(Int_t) * fNDims);
-   fInputFile->read((Char_t *)&fStagger, sizeof(fStagger));
+   fInputFile->read((Char_t *)fNParticles, sizeof(Long64_t));
 }
 
-void TSDFBlockPlainVar::PrintMetadata()
+void TBlockPointVar::PrintMetadata()
 {
    cout << "Normalization factor: " << fNormFactor <<"\n"
         << "Units: " << fUnits <<"\n"
         << "Mesh ID: " << fMeshID << endl;
-   cout << "No. Grids" <<"\t"
-        << fNGrids[0] <<"\t"
-        << fNGrids[1] <<"\t"
-        << fNGrids[2] << endl;
-   cout << "Stagger: " << fStagger << endl;
+   cout << "No. Particles: " << fNParticles << endl;
 }

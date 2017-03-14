@@ -1,18 +1,18 @@
-#ifndef TSDFBLOCKPLAINMESH
-#define TSDFBLOCKPLAINMESH 1
+#ifndef TBLOCKPOINTMESH
+#define TBLOCKPOINTMESH 1
 
 #include <fstream>
 #include <vector>
 
 #include <TString.h>
 
-#include "TSDFBlock.hpp"
+#include "TBlock.hpp"
 
 
-class TSDFBlockPlainMesh: public TSDFBlock
+class TBlockPointMesh: public TBlock
 {
 public:
-   TSDFBlockPlainMesh(std::ifstream *, Long_t, Int_t, Int_t);
+   TBlockPointMesh(std::ifstream *, Long_t, Int_t, Int_t);
    
    void ReadMetadata();
    void PrintMetadata();
@@ -24,7 +24,7 @@ private:
    Int_t fGeoType;
    Double_t fMinVal[3];
    Double_t fMaxVal[3];
-   Int_t fNGrids[3];
+   Long64_t fNParticles;
    
 };
 

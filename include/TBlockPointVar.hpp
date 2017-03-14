@@ -1,18 +1,18 @@
-#ifndef TSDFBLOCKPOINTVAR
-#define TSDFBLOCKPOINTVAR 1
+#ifndef TBLOCKPOINTVAR
+#define TBLOCKPOINTVAR 1
 
 #include <fstream>
 #include <vector>
 
 #include <TString.h>
 
-#include "TSDFBlock.hpp"
+#include "TBlock.hpp"
 
 
-class TSDFBlockPointVar: public TSDFBlock
+class TBlockPointVar: public TBlock
 {
 public:
-   TSDFBlockPointVar(std::ifstream *, Long_t, Int_t, Int_t);
+   TBlockPointVar(std::ifstream *, Long_t, Int_t, Int_t);
       
    void ReadMetadata();
    void PrintMetadata();

@@ -6,7 +6,7 @@
 
 #include <TString.h>
 
-#include "TSDFBlock.hpp"
+#include "TBlock.hpp"
 
 const Int_t kSDFVersion = 1;
 const Int_t kSDFRevision = 1;
@@ -22,9 +22,11 @@ public:
 
    Int_t GetNBlocks() {return fNBlocks;};
    
-   TSDFBlock *GetBlock(Int_t i){return fBlock[i];};
+   TBlock *GetBlock(Int_t i){return fBlock[i];};
+   // dont use getter.  lazy code
+   std::vector<TBlock *> fBlock;
 
-   std::vector<TSDFBlock *> fBlock;
+   TString GetFileName(){return fFileName;};
    
 private:
    void LoadBlocks();

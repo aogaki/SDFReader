@@ -4,14 +4,13 @@
 
 #include <iostream>
 
-#include "TSDFReader.hpp"
-#include "TSDFBlock.hpp"
+#include "TBlock.hpp"
 
 
 using std::cout;
 using std::endl;
 
-TSDFBlock::TSDFBlock()
+TBlock::TBlock()
 {
    fDataSize = 0;
    fInputFile = nullptr;
@@ -33,7 +32,7 @@ TSDFBlock::TSDFBlock()
    fBlockName = "";
 }
 
-TSDFBlock::TSDFBlock(std::ifstream *file, Long_t location,
+TBlock::TBlock(std::ifstream *file, Long_t location,
                      Int_t stringLength, Int_t headerLength)
 {
    fInputFile = file;
@@ -56,10 +55,10 @@ TSDFBlock::TSDFBlock(std::ifstream *file, Long_t location,
    ReadHeader();
 }
 
-TSDFBlock::~TSDFBlock()
+TBlock::~TBlock()
 {}
 
-void TSDFBlock::ReadHeader()
+void TBlock::ReadHeader()
 {
    fInputFile->seekg(fBlockLocation, std::ios::beg);
    fInputFile->read((Char_t *)&fNextLocation, sizeof(fNextLocation));
@@ -79,7 +78,7 @@ void TSDFBlock::ReadHeader()
    fInputFile->read((Char_t *)&fBlockInfoLength, sizeof(fBlockInfoLength));
 }
 
-void TSDFBlock::PrintHeader()
+void TBlock::PrintHeader()
 {
    cout << "\n\tBlock header" <<"\n"
         << "block_start = " << fBlockLocation <<"\n"
@@ -94,20 +93,23 @@ void TSDFBlock::PrintHeader()
         << "next_block_location = " << fNextLocation << endl;
 }
 
-void TSDFBlock::ReadData()
+void TBlock::ReadData()
 {
-   fInputFile->seekg(fDataLocation, std::ios::beg);
-
-   if(fDataType == 4) ReadData64();
-   else if(fDataType == 3) ReadData32();
-   else{
-      cout << "DataType error in ReadData@BlockPlaneMesh" << endl;
-      cout << "Now, only double and float data types are implemented" << endl;
-      exit(0);
+   if(fData.size() == 0){
+      fInputFile->seekg(fDataLocation, std::ios::beg);
+      
+      if(fDataType == 4) ReadData64();
+      else if(fDataType == 3) ReadData32();
+      else{
+         cout << "DataType error in ReadData@BlockPlaneMesh" << endl;
+         cout << "Now, only double and float data types are implemented" << endl;
+         exit(0);
+      }
    }
+   //else cout << "Already readed" << endl;
 }
 
-void TSDFBlock::ReadData64()
+void TBlock::ReadData64()
 {
    Double_t buf;
    fDataSize = fDataLength / 8;
@@ -118,7 +120,7 @@ void TSDFBlock::ReadData64()
    }
 }
 
-void TSDFBlock::ReadData32()
+void TBlock::ReadData32()
 {
    Float_t buf;
    fDataSize = fDataLength / 4;

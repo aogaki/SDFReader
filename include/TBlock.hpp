@@ -1,17 +1,18 @@
-#ifndef TSDFBLOCK
-#define TSDFBLOCK 1
+#ifndef TBLOCK
+#define TBLOCK 1
 
+#include <iostream>
 #include <fstream>
 
 #include <TString.h>
 
 
-class TSDFBlock
+class TBlock
 {
 public:
-   TSDFBlock();
-   TSDFBlock(std::ifstream *, Long_t, Int_t, Int_t);
-   virtual ~TSDFBlock();
+   TBlock();
+   TBlock(std::ifstream *, Long_t, Int_t, Int_t);
+   virtual ~TBlock();
 
    virtual Long_t GetNextLocation() {return fNextLocation;};
    
@@ -30,6 +31,9 @@ public:
    TString GetID(){return fBlockID;};
    Int_t GetBlockType(){return fBlockType;};
    Int_t GetDataType(){return fDataType;};
+   Int_t GetNDims(){return fNDims;};
+
+   Double_t GetData(Int_t i){return fData[i];};
    
 protected:
    // For header and general information

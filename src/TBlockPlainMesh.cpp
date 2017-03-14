@@ -4,16 +4,15 @@
 
 #include <iostream>
 
-#include "TSDFReader.hpp"
-#include "TSDFBlockPlainMesh.hpp"
+#include "TBlockPlainMesh.hpp"
 
 
 using std::cout;
 using std::endl;
 
-TSDFBlockPlainMesh::TSDFBlockPlainMesh(std::ifstream *file, Long_t location,
+TBlockPlainMesh::TBlockPlainMesh(std::ifstream *file, Long_t location,
                                        Int_t stringLength, Int_t headerLength)
-   :TSDFBlock()
+   :TBlock()
 {
    fInputFile = file;
    fBlockLocation = location;
@@ -36,7 +35,7 @@ TSDFBlockPlainMesh::TSDFBlockPlainMesh(std::ifstream *file, Long_t location,
    ReadHeader();
 }
 
-void TSDFBlockPlainMesh::ReadMetadata()
+void TBlockPlainMesh::ReadMetadata()
 {
    fInputFile->seekg(fMetadataLocation, std::ios::beg);
    fInputFile->read((Char_t *)fNormFactor, sizeof(Double_t) * fNDims);
@@ -58,7 +57,7 @@ void TSDFBlockPlainMesh::ReadMetadata()
    fInputFile->read((Char_t *)fNGrids, sizeof(Int_t) * fNDims);
 }
 
-void TSDFBlockPlainMesh::PrintMetadata()
+void TBlockPlainMesh::PrintMetadata()
 {
    cout << "Normalization factor: "
         << fNormFactor[0] <<"\t"

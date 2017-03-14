@@ -4,16 +4,15 @@
 
 #include <iostream>
 
-#include "TSDFReader.hpp"
-#include "TSDFBlockPointMesh.hpp"
+#include "TBlockPointMesh.hpp"
 
 
 using std::cout;
 using std::endl;
 
-TSDFBlockPointMesh::TSDFBlockPointMesh(std::ifstream *file, Long_t location,
+TBlockPointMesh::TBlockPointMesh(std::ifstream *file, Long_t location,
                                        Int_t stringLength, Int_t headerLength)
-   :TSDFBlock()
+   :TBlock()
 {
    fInputFile = file;
    fBlockLocation = location;
@@ -36,7 +35,7 @@ TSDFBlockPointMesh::TSDFBlockPointMesh(std::ifstream *file, Long_t location,
    ReadHeader();
 }
 
-void TSDFBlockPointMesh::ReadMetadata()
+void TBlockPointMesh::ReadMetadata()
 {
    fInputFile->seekg(fMetadataLocation, std::ios::beg);
    fInputFile->read((Char_t *)fNormFactor, sizeof(Double_t) * fNDims);
@@ -58,7 +57,7 @@ void TSDFBlockPointMesh::ReadMetadata()
    fInputFile->read((Char_t *)fNParticles, sizeof(Long64_t));
 }
 
-void TSDFBlockPointMesh::PrintMetadata()
+void TBlockPointMesh::PrintMetadata()
 {
    cout << "Normalization factor: "
         << fNormFactor[0] <<"\t"
