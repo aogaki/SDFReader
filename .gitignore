@@ -7,6 +7,7 @@ Data
 cmake_install.cmake
 sdf2root
 Makefile
+*.root
 *.pcm
 *.so
 *.d

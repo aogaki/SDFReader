@@ -10,7 +10,7 @@ using std::endl;
 int main(int argc, char **argv)
 {
    //TString fileName = "Data/0006.sdf";
-   TString fileName = "Data/0030.sdf";
+   TString fileName = "Data/0300.sdf";
 
    // Reading file information
    TSDFReader *reader = new TSDFReader(fileName);

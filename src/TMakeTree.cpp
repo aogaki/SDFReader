@@ -9,91 +9,167 @@ using std::cout;
 using std::endl;
 
 TMakeTree::TMakeTree(TSDFReader *reader)
-   : fReader(reader)
+   : fReader(reader),
+     fEx(nullptr), 
+     fEy(nullptr), 
+     fEz(nullptr), 
+     fBx(nullptr), 
+     fBy(nullptr), 
+     fBz(nullptr), 
+     fJx(nullptr), 
+     fJy(nullptr), 
+     fJz(nullptr)
 {
-   fField = new TFieldValue();
-   
-   Int_t index = GetBlockIndex("grid");
-   if(index > 0) fFieldGrid = (TBlockPlainMesh*)fReader->fBlock[index];
-   else{
-      cout << "No field grid" << endl;
-      fFieldGrid = nullptr;
+   for(Int_t i = 0; i < 3; i++){
+      fHisMin[i] = 0;
+      fHisMax[i] = 0;
+      fHisNbins[i] = 0;
+      fHisBinWidth[i] = 0;
+      fHisUnit[i] = "";
+      fHisLabel[i] = "";
    }
-   
-   fFieldGrid->ReadData();
-   
+   ReadFieldGrid();
 }
 
 TMakeTree::~TMakeTree()
 {
    SaveTree();
-
-   delete fField;
 }
 
 void TMakeTree::GetData()
 {
-   fField->Ex = GetEx();
+   GetFieldData();
 }
 
-TH1 *TMakeTree::GetEx()
+
+void TMakeTree::GetFieldData()
+{
+   fEx = GetFieldHis("ex", "Ex", "Electric field x");
+   fEy = GetFieldHis("ey", "Ey", "Electric field y");
+   fEz = GetFieldHis("ez", "Ez", "Electric field z");
+   
+   fBx = GetFieldHis("bx", "Bx", "Magnetic field x");
+   fBy = GetFieldHis("by", "By", "Magnetic field y");
+   fBz = GetFieldHis("bz", "Bz", "Magnetic field z");
+
+   fJx = GetFieldHis("jx", "Jx", "Current x");
+   fJy = GetFieldHis("jy", "Jy", "Current y");
+   fJz = GetFieldHis("jz", "Jz", "Current z");
+}
+
+TH1 *TMakeTree::GetFieldHis(TString blockName, TString hisName, TString hisTitle)
 {
    TH1 *his{nullptr};
 
-   Int_t index = GetBlockIndex("ex");
+   Int_t index = GetBlockIndex(blockName);
    if(index < 0) return nullptr;
    
    TBlockPlainVar *block = (TBlockPlainVar*)fReader->fBlock[index];
    block->ReadData();
 
-   TString name = "Ex";
-   TString title = "Electric Field x";
+   TString name = hisName;
+   TString title = hisTitle;
    Double_t norm = block->GetNormFactor();
-   Int_t nBins[3]{
-      block->GetNGrids(0),
-      block->GetNGrids(1),
-      block->GetNGrids(2)
-   };
+
    Int_t stagger = block->GetStagger();
    Int_t dim = block->GetNDims();
 
+   Double_t delta[3] = {
+      fHisBinWidth[0] / 2.,
+      fHisBinWidth[1] / 2.,
+      fHisBinWidth[2] / 2.,      
+   };
+
+   // stagger.  Don't use bit mask.  Use number
+   // Check is this right or not.
+   Double_t shift[3] = {0., 0., 0.};
+   if(stagger == 1)
+      shift[0] += delta[0];
+   else if(stagger == 2)
+      shift[1] += delta[1];
+   else if(stagger == 4)
+      shift[2] += delta[2];
+   else if(stagger == 3){
+      shift[0] += delta[0];
+      shift[1] += delta[1];
+   }   
+   else if(stagger == 5){
+      shift[0] += delta[0];
+      shift[2] += delta[2];
+   }   
+   else if(stagger == 6){
+      shift[1] += delta[1];
+      shift[2] += delta[2];
+   }   
+   else if(stagger == 7){
+      shift[0] += delta[0];
+      shift[1] += delta[1];
+      shift[2] += delta[2];
+   }
+   else if(stagger != 0){
+      cout << "stagger error: " << stagger << endl;
+   }
+   
    if(dim == 1){
       his = new TH1D(name, title,
-                     nBins[0], 0, nBins[0]);
-      for(Int_t x = 1; x <= nBins[0]; x++){
+                     fHisNbins[0], fHisMin[0] - delta[0] + shift[0], fHisMax[0] + delta[0] + shift[0]);
+      for(Int_t x = 1; x <= fHisNbins[0]; x++){
          his->SetBinContent(x, norm * block->GetData(x - 1));
       }
    }
    else if(dim == 2){
       his = new TH2D(name, title,
-                     nBins[0], 0, nBins[0],
-                     nBins[1], 0, nBins[1]);
-      for(Int_t x = 1; x <= nBins[0]; x++){
-         for(Int_t y = 1; y <= nBins[1]; y++){
-            Int_t i = (x - 1) + ((y - 1) * nBins[0]);
+                     fHisNbins[0], fHisMin[0] - delta[0] + shift[0], fHisMax[0] + delta[0] + shift[0],
+                     fHisNbins[1], fHisMin[1] - delta[1] + shift[1], fHisMax[1] + delta[1] + shift[1]);
+      for(Int_t x = 1; x <= fHisNbins[0]; x++){
+         for(Int_t y = 1; y <= fHisNbins[1]; y++){
+            Int_t i = (x - 1) + ((y - 1) * fHisNbins[0]);
             his->SetBinContent(x, y, norm * block->GetData(i));
          }
       }
    }
    else if(dim == 3){
       his = new TH3D(name, title,
-                     nBins[0], 0, nBins[0],
-                     nBins[1], 0, nBins[1],
-                     nBins[2], 0, nBins[2]);
-      for(Int_t x = 1; x <= nBins[0]; x++){
-         for(Int_t y = 1; y <= nBins[1]; y++){
-            for(Int_t z = 1; z <= nBins[2]; z++){
-               Int_t i = (x - 1) + ((y - 1) * nBins[0]) + ((y - 1) * nBins[0] * nBins[1]);
+                     fHisNbins[0], fHisMin[0] - delta[0] + shift[0], fHisMax[0] + delta[0] + shift[0],
+                     fHisNbins[1], fHisMin[1] - delta[1] + shift[1], fHisMax[1] + delta[1] + shift[1],
+                     fHisNbins[2], fHisMin[2] - delta[2] + shift[2], fHisMax[2] + delta[2] + shift[2]);
+      for(Int_t x = 1; x <= fHisNbins[0]; x++){
+         for(Int_t y = 1; y <= fHisNbins[1]; y++){
+            for(Int_t z = 1; z <= fHisNbins[2]; z++){
+               Int_t i = (x - 1) + ((y - 1) * fHisNbins[0]) + ((y - 1) * fHisNbins[0] * fHisNbins[1]);
                his->SetBinContent(x, y, z, norm * block->GetData(i));
             }
          }
       }
    }
 
-   block->PrintHeader();
-   block->PrintMetadata();
+   //block->PrintHeader();
+   //block->PrintMetadata();
    
    return his;
+}
+
+void TMakeTree::ReadFieldGrid()
+{
+   Int_t index = GetBlockIndex("grid");
+   if(index < 0) return;
+   
+   TBlockPlainMesh *block = (TBlockPlainMesh*)fReader->fBlock[index];
+
+   block->ReadMetadata();
+   for(Int_t i = 0; i < 3; i++){
+      fHisMin[i] = block->GetMinVal(i);
+      fHisMax[i] = block->GetMaxVal(i);
+      fHisNbins[i] = block->GetNGrids(i);
+      fHisUnit[i] = block->GetUnits(i);
+      fHisLabel[i] = block->GetAxisLabel(i);
+   }
+
+   block->ReadData();
+   fHisBinWidth[0] = fabs(block->GetData(1) - block->GetData(0));
+   if(fHisNbins[1] > 1) fHisBinWidth[1] = fabs(block->GetData(1 + fHisNbins[0]) - block->GetData(fHisNbins[0]));
+   if(fHisNbins[2] > 1) fHisBinWidth[2] = fabs(block->GetData(1 + fHisNbins[0] * fHisNbins[1])
+                                               - block->GetData(fHisNbins[0] * fHisNbins[1]));
 }
 
 void TMakeTree::SaveTree()
@@ -101,7 +177,17 @@ void TMakeTree::SaveTree()
    
    TFile *file = new TFile("out.root", "RECREATE");
 
-   fField->Ex->Write();
+   if(fEx != nullptr) fEx->Write();
+   if(fEy != nullptr) fEy->Write();
+   if(fEz != nullptr) fEz->Write();
+
+   if(fBx != nullptr) fBx->Write();
+   if(fBy != nullptr) fBy->Write();
+   if(fBz != nullptr) fBz->Write();
+
+   if(fJx != nullptr) fJx->Write();
+   if(fJy != nullptr) fJy->Write();
+   if(fJz != nullptr) fJz->Write();
 
    file->Close();
 }

@@ -25,7 +25,7 @@ public:
    virtual void ReadData();
    virtual void PrintData(){for(auto v: fData) std::cout << v << std::endl;};
 
-   Int_t GetDataSize(){return fDataSize;};
+   //Int_t GetDataSize(){return fDataSize;};
 
    TString GetName(){return fBlockName;};
    TString GetID(){return fBlockID;};
@@ -34,6 +34,7 @@ public:
    Int_t GetNDims(){return fNDims;};
 
    Double_t GetData(Int_t i){return fData[i];};
+   Int_t GetDataSize(){return fData.size();};
    
 protected:
    // For header and general information
