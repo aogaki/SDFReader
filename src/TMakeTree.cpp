@@ -23,7 +23,6 @@ TMakeTree::TMakeTree(TSDFReader *reader)
    for(Int_t i = 0; i < 3; i++){
       fHisMin[i] = 0;
       fHisMax[i] = 0;
-      fHisNbins[i] = 0;
       fHisBinWidth[i] = 0;
       fHisUnit[i] = "";
       fHisLabel[i] = "";
@@ -71,9 +70,15 @@ TH1 *TMakeTree::GetFieldHis(TString blockName, TString hisName, TString hisTitle
    TString title = hisTitle;
    Double_t norm = block->GetNormFactor();
 
+   Int_t nBins[3] = {
+      block->GetNGrids(0),
+      block->GetNGrids(1),
+      block->GetNGrids(2),
+   };
+   
    Int_t stagger = block->GetStagger();
    Int_t dim = block->GetNDims();
-
+   
    Double_t delta[3] = {
       fHisBinWidth[0] / 2.,
       fHisBinWidth[1] / 2.,
@@ -112,31 +117,31 @@ TH1 *TMakeTree::GetFieldHis(TString blockName, TString hisName, TString hisTitle
    
    if(dim == 1){
       his = new TH1D(name, title,
-                     fHisNbins[0], fHisMin[0] - delta[0] + shift[0], fHisMax[0] + delta[0] + shift[0]);
-      for(Int_t x = 1; x <= fHisNbins[0]; x++){
+                     nBins[0], fHisMin[0] - delta[0] + shift[0], fHisMax[0] + delta[0] + shift[0]);
+      for(Int_t x = 1; x <= nBins[0]; x++){
          his->SetBinContent(x, norm * block->GetData(x - 1));
       }
    }
    else if(dim == 2){
       his = new TH2D(name, title,
-                     fHisNbins[0], fHisMin[0] - delta[0] + shift[0], fHisMax[0] + delta[0] + shift[0],
-                     fHisNbins[1], fHisMin[1] - delta[1] + shift[1], fHisMax[1] + delta[1] + shift[1]);
-      for(Int_t x = 1; x <= fHisNbins[0]; x++){
-         for(Int_t y = 1; y <= fHisNbins[1]; y++){
-            Int_t i = (x - 1) + ((y - 1) * fHisNbins[0]);
+                     nBins[0], fHisMin[0] - delta[0] + shift[0], fHisMax[0] + delta[0] + shift[0],
+                     nBins[1], fHisMin[1] - delta[1] + shift[1], fHisMax[1] + delta[1] + shift[1]);
+      for(Int_t x = 1; x <= nBins[0]; x++){
+         for(Int_t y = 1; y <= nBins[1]; y++){
+            Int_t i = (x - 1) + ((y - 1) * nBins[0]);
             his->SetBinContent(x, y, norm * block->GetData(i));
          }
       }
    }
    else if(dim == 3){
       his = new TH3D(name, title,
-                     fHisNbins[0], fHisMin[0] - delta[0] + shift[0], fHisMax[0] + delta[0] + shift[0],
-                     fHisNbins[1], fHisMin[1] - delta[1] + shift[1], fHisMax[1] + delta[1] + shift[1],
-                     fHisNbins[2], fHisMin[2] - delta[2] + shift[2], fHisMax[2] + delta[2] + shift[2]);
-      for(Int_t x = 1; x <= fHisNbins[0]; x++){
-         for(Int_t y = 1; y <= fHisNbins[1]; y++){
-            for(Int_t z = 1; z <= fHisNbins[2]; z++){
-               Int_t i = (x - 1) + ((y - 1) * fHisNbins[0]) + ((y - 1) * fHisNbins[0] * fHisNbins[1]);
+                     nBins[0], fHisMin[0] - delta[0] + shift[0], fHisMax[0] + delta[0] + shift[0],
+                     nBins[1], fHisMin[1] - delta[1] + shift[1], fHisMax[1] + delta[1] + shift[1],
+                     nBins[2], fHisMin[2] - delta[2] + shift[2], fHisMax[2] + delta[2] + shift[2]);
+      for(Int_t x = 1; x <= nBins[0]; x++){
+         for(Int_t y = 1; y <= nBins[1]; y++){
+            for(Int_t z = 1; z <= nBins[2]; z++){
+               Int_t i = (x - 1) + ((y - 1) * nBins[0]) + ((y - 1) * nBins[0] * nBins[1]);
                his->SetBinContent(x, y, z, norm * block->GetData(i));
             }
          }
@@ -157,19 +162,20 @@ void TMakeTree::ReadFieldGrid()
    TBlockPlainMesh *block = (TBlockPlainMesh*)fReader->fBlock[index];
 
    block->ReadMetadata();
+   Int_t nGrids[3];
    for(Int_t i = 0; i < 3; i++){
       fHisMin[i] = block->GetMinVal(i);
       fHisMax[i] = block->GetMaxVal(i);
-      fHisNbins[i] = block->GetNGrids(i);
+      nGrids[i] = block->GetNGrids(i);
       fHisUnit[i] = block->GetUnits(i);
       fHisLabel[i] = block->GetAxisLabel(i);
    }
 
    block->ReadData();
    fHisBinWidth[0] = fabs(block->GetData(1) - block->GetData(0));
-   if(fHisNbins[1] > 1) fHisBinWidth[1] = fabs(block->GetData(1 + fHisNbins[0]) - block->GetData(fHisNbins[0]));
-   if(fHisNbins[2] > 1) fHisBinWidth[2] = fabs(block->GetData(1 + fHisNbins[0] * fHisNbins[1])
-                                               - block->GetData(fHisNbins[0] * fHisNbins[1]));
+   if(nGrids[1] > 1) fHisBinWidth[1] = fabs(block->GetData(1 + nGrids[0]) - block->GetData(nGrids[0]));
+   if(nGrids[2] > 1) fHisBinWidth[2] = fabs(block->GetData(1 + nGrids[0] * nGrids[1])
+                                            - block->GetData(nGrids[0] * nGrids[1]));
 }
 
 void TMakeTree::SaveTree()
