@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "TSDFReader.hpp"
-#include "TMakeTree.hpp"
+#include "TConverter.hpp"
 
 
 using std::cout;
@@ -29,10 +29,10 @@ int main(int argc, char **argv)
    // Filling root file
    // NYI
 
-   TMakeTree *makeTree = new TMakeTree(reader);
-   makeTree->GetData();
+   TConverter *converter = new TConverter(reader);
+   converter->GetData();
    
-   delete makeTree;
+   delete converter;
    delete reader;
 
    return 0;

@@ -1,24 +1,17 @@
 #include <iostream>
 
-#include <TFile.h>
-
-#include "TMakeTree.hpp"
+#include "TConverter.hpp"
 #include "TBlockPlainVar.hpp"
+#include "TMacroParticle.hpp"
 
 using std::cout;
 using std::endl;
 
-TMakeTree::TMakeTree(TSDFReader *reader)
+TConverter::TConverter(TSDFReader *reader)
    : fReader(reader),
-     fEx(nullptr), 
-     fEy(nullptr), 
-     fEz(nullptr), 
-     fBx(nullptr), 
-     fBy(nullptr), 
-     fBz(nullptr), 
-     fJx(nullptr), 
-     fJy(nullptr), 
-     fJz(nullptr)
+     fOutput(nullptr),
+     fTree(nullptr),
+     fFieldValue(nullptr)
 {
    for(Int_t i = 0; i < 3; i++){
       fHisMin[i] = 0;
@@ -28,40 +21,52 @@ TMakeTree::TMakeTree(TSDFReader *reader)
       fHisLabel[i] = "";
    }
    ReadFieldGrid();
+   
+   fOutput = new TFile("out.root", "RECREATE");
+   fTree= new TTree("EPOCH", "EPOCH simulation data");
+   fFieldValue = new TFieldValue();
+   fTree->Branch("FieldValue", fFieldValue);
+
+   
+   //fFieldValue = new TFieldValue();
 }
 
-TMakeTree::~TMakeTree()
+TConverter::~TConverter()
 {
    SaveTree();
+
+   fOutput->Close();
+   
+   delete fFieldValue;
 }
 
-void TMakeTree::GetData()
+void TConverter::GetData()
 {
    GetFieldData();
 }
 
 
-void TMakeTree::GetFieldData()
+void TConverter::GetFieldData()
 {
-   fEx = GetFieldHis("ex", "Ex", "Electric field x");
-   fEy = GetFieldHis("ey", "Ey", "Electric field y");
-   fEz = GetFieldHis("ez", "Ez", "Electric field z");
+   fFieldValue->SetEx(GetFieldHis("ex", "Ex", "Electric field x"));
+   fFieldValue->SetEy(GetFieldHis("ey", "Ey", "Electric field y"));
+   fFieldValue->SetEz(GetFieldHis("ez", "Ez", "Electric field z"));
    
-   fBx = GetFieldHis("bx", "Bx", "Magnetic field x");
-   fBy = GetFieldHis("by", "By", "Magnetic field y");
-   fBz = GetFieldHis("bz", "Bz", "Magnetic field z");
+   fFieldValue->SetBx(GetFieldHis("bx", "Bx", "Magnetic field x"));
+   fFieldValue->SetBy(GetFieldHis("by", "By", "Magnetic field y"));
+   fFieldValue->SetBz(GetFieldHis("bz", "Bz", "Magnetic field z"));
 
-   fJx = GetFieldHis("jx", "Jx", "Current x");
-   fJy = GetFieldHis("jy", "Jy", "Current y");
-   fJz = GetFieldHis("jz", "Jz", "Current z");
+   fFieldValue->SetJx(GetFieldHis("jx", "Jx", "Current x"));
+   fFieldValue->SetJy(GetFieldHis("jy", "Jy", "Current y"));
+   fFieldValue->SetJz(GetFieldHis("jz", "Jz", "Current z"));
 }
 
-TH1 *TMakeTree::GetFieldHis(TString blockName, TString hisName, TString hisTitle)
+TH1 *TConverter::GetFieldHis(TString blockName, TString hisName, TString hisTitle)
 {
    TH1 *his{nullptr};
 
    Int_t index = GetBlockIndex(blockName);
-   if(index < 0) return nullptr;
+   if(index < 0) return new TH1D();// nullptr is better?
    
    TBlockPlainVar *block = (TBlockPlainVar*)fReader->fBlock[index];
    block->ReadData();
@@ -118,6 +123,7 @@ TH1 *TMakeTree::GetFieldHis(TString blockName, TString hisName, TString hisTitle
    if(dim == 1){
       his = new TH1D(name, title,
                      nBins[0], fHisMin[0] - delta[0] + shift[0], fHisMax[0] + delta[0] + shift[0]);
+      his->SetXTitle(fHisLabel[0] + " [" + fHisUnit[0] + "]");
       for(Int_t x = 1; x <= nBins[0]; x++){
          his->SetBinContent(x, norm * block->GetData(x - 1));
       }
@@ -126,6 +132,8 @@ TH1 *TMakeTree::GetFieldHis(TString blockName, TString hisName, TString hisTitle
       his = new TH2D(name, title,
                      nBins[0], fHisMin[0] - delta[0] + shift[0], fHisMax[0] + delta[0] + shift[0],
                      nBins[1], fHisMin[1] - delta[1] + shift[1], fHisMax[1] + delta[1] + shift[1]);
+      his->SetXTitle(fHisLabel[0] + " [" + fHisUnit[0] + "]");
+      his->SetYTitle(fHisLabel[1] + " [" + fHisUnit[1] + "]");
       for(Int_t x = 1; x <= nBins[0]; x++){
          for(Int_t y = 1; y <= nBins[1]; y++){
             Int_t i = (x - 1) + ((y - 1) * nBins[0]);
@@ -138,6 +146,9 @@ TH1 *TMakeTree::GetFieldHis(TString blockName, TString hisName, TString hisTitle
                      nBins[0], fHisMin[0] - delta[0] + shift[0], fHisMax[0] + delta[0] + shift[0],
                      nBins[1], fHisMin[1] - delta[1] + shift[1], fHisMax[1] + delta[1] + shift[1],
                      nBins[2], fHisMin[2] - delta[2] + shift[2], fHisMax[2] + delta[2] + shift[2]);
+      his->SetXTitle(fHisLabel[0] + " [" + fHisUnit[0] + "]");
+      his->SetYTitle(fHisLabel[1] + " [" + fHisUnit[1] + "]");
+      his->SetZTitle(fHisLabel[2] + " [" + fHisUnit[2] + "]");
       for(Int_t x = 1; x <= nBins[0]; x++){
          for(Int_t y = 1; y <= nBins[1]; y++){
             for(Int_t z = 1; z <= nBins[2]; z++){
@@ -154,7 +165,7 @@ TH1 *TMakeTree::GetFieldHis(TString blockName, TString hisName, TString hisTitle
    return his;
 }
 
-void TMakeTree::ReadFieldGrid()
+void TConverter::ReadFieldGrid()
 {
    Int_t index = GetBlockIndex("grid");
    if(index < 0) return;
@@ -178,27 +189,13 @@ void TMakeTree::ReadFieldGrid()
                                             - block->GetData(nGrids[0] * nGrids[1]));
 }
 
-void TMakeTree::SaveTree()
+void TConverter::SaveTree()
 {
-   
-   TFile *file = new TFile("out.root", "RECREATE");
-
-   if(fEx != nullptr) fEx->Write();
-   if(fEy != nullptr) fEy->Write();
-   if(fEz != nullptr) fEz->Write();
-
-   if(fBx != nullptr) fBx->Write();
-   if(fBy != nullptr) fBy->Write();
-   if(fBz != nullptr) fBz->Write();
-
-   if(fJx != nullptr) fJx->Write();
-   if(fJy != nullptr) fJy->Write();
-   if(fJz != nullptr) fJz->Write();
-
-   file->Close();
+   fTree->Fill();
+   fTree->Write();
 }
 
-Int_t TMakeTree::GetBlockIndex(TString ID)
+Int_t TConverter::GetBlockIndex(TString ID)
 {
    for(Int_t i = 0; i < fReader->GetNBlocks(); i++)
       if(ID == fReader->fBlock[i]->GetID()) return i;
