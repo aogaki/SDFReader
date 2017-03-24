@@ -1,8 +1,8 @@
-#ifndef TFIELDVALUE
-#define TFIELDVALUE 1
+#ifndef TMESHVALUE
+#define TMESHVALUE 1
 
 /*
-    Data class for field values.
+    Data class for mesh values.
 */
 
 #include <vector>
@@ -11,13 +11,13 @@
 #include <TH2.h>
 #include <TH3.h>
 
-class TFieldValue: public TObject
+class TMeshValue: public TObject
 {
 public:
-   TFieldValue();
-   ~TFieldValue();
+   TMeshValue();
+   ~TMeshValue();
 
-   ClassDef(TFieldValue, 1);
+   ClassDef(TMeshValue, 1);
    
    void SetEx(TH1 *his) {fEx = his;};
    TH1 *GetEx() {return fEx;};
@@ -57,8 +57,8 @@ private:
 };
 
 #ifdef __MAKECINT__
-#pragma link C++ class TFieldValue+;
-#pragma link C++ class std::vector<TFieldValue>+;
+#pragma link C++ class TMeshValue+;
+#pragma link C++ class std::vector<TMeshValue>+;
 #endif
 
 #endif

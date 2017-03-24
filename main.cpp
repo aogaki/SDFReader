@@ -12,6 +12,8 @@ int main(int argc, char **argv)
    //TString fileName = "Data/0006.sdf";
    TString fileName = "Data/0030.sdf";
 
+   if(argc == 2) fileName = argv[1];
+   
    // Reading file information
    TSDFReader *reader = new TSDFReader(fileName);
    Int_t counter = 0;
@@ -23,11 +25,6 @@ int main(int argc, char **argv)
            << block->GetID() <<"\t"
            << endl;
    }
-
-   //block->PrintData();
-   
-   // Filling root file
-   // NYI
 
    TConverter *converter = new TConverter(reader);
    converter->GetData();

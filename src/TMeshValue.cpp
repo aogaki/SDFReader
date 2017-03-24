@@ -1,6 +1,6 @@
-#include "TFieldValue.hpp"
+#include "TMeshValue.hpp"
 
-TFieldValue::TFieldValue()
+TMeshValue::TMeshValue()
    : fEx(nullptr),
      fEy(nullptr),
      fEz(nullptr),   
@@ -12,5 +12,5 @@ TFieldValue::TFieldValue()
      fJz(nullptr)
 {}
 
-TFieldValue::~TFieldValue()
+TMeshValue::~TMeshValue()
 {}

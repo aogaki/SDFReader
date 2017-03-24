@@ -5,7 +5,7 @@ Data
 2D/
 3D/
 cmake_install.cmake
-SDF2ROOTDict.cxx
+SDF2ROOTDict.cpp
 sdf2root
 Makefile
 *.root

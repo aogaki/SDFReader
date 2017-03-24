@@ -99,13 +99,11 @@ void TSDFReader::ReadFileHeader()
    fInputFile->read((Char_t *)(&fBlockHeaderLength), sizeof(fBlockHeaderLength));
    cout << "block_header_length = " << fBlockHeaderLength << endl;
 
-   Int_t step;
-   fInputFile->read((Char_t *)(&step), sizeof(step));
-   cout << "step = " << step << endl;
+   fInputFile->read((Char_t *)(&fStep), sizeof(fStep));
+   cout << "step = " << fStep << endl;
 
-   Double_t time;
-   fInputFile->read((Char_t *)(&time), sizeof(time));
-   cout << "time = " << time << endl;
+   fInputFile->read((Char_t *)(&fTime), sizeof(fTime));
+   cout << "time = " << fTime << endl;
 
    fInputFile->read((Char_t *)(&fJobID1), sizeof(fJobID1));
    cout << "jobid1 = " << fJobID1 << endl;

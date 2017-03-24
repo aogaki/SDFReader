@@ -11,7 +11,7 @@ TConverter::TConverter(TSDFReader *reader)
    : fReader(reader),
      fOutput(nullptr),
      fTree(nullptr),
-     fFieldValue(nullptr)
+     fMeshValue(nullptr)
 {
    for(Int_t i = 0; i < 3; i++){
       fHisMin[i] = 0;
@@ -20,15 +20,15 @@ TConverter::TConverter(TSDFReader *reader)
       fHisUnit[i] = "";
       fHisLabel[i] = "";
    }
-   ReadFieldGrid();
+   ReadMeshGrid();
    
    fOutput = new TFile("out.root", "RECREATE");
    fTree= new TTree("EPOCH", "EPOCH simulation data");
-   fFieldValue = new TFieldValue();
-   fTree->Branch("FieldValue", fFieldValue);
+   fMeshValue = new TMeshValue();
+   fTree->Branch("MeshValue", fMeshValue);
 
    
-   //fFieldValue = new TFieldValue();
+   //fMeshValue = new TMeshValue();
 }
 
 TConverter::~TConverter()
@@ -37,31 +37,31 @@ TConverter::~TConverter()
 
    fOutput->Close();
    
-   delete fFieldValue;
+   delete fMeshValue;
 }
 
 void TConverter::GetData()
 {
-   GetFieldData();
+   GetMeshData();
 }
 
 
-void TConverter::GetFieldData()
+void TConverter::GetMeshData()
 {
-   fFieldValue->SetEx(GetFieldHis("ex", "Ex", "Electric field x"));
-   fFieldValue->SetEy(GetFieldHis("ey", "Ey", "Electric field y"));
-   fFieldValue->SetEz(GetFieldHis("ez", "Ez", "Electric field z"));
+   fMeshValue->SetEx(GetMeshHis("ex", "Ex", "Electric field x"));
+   fMeshValue->SetEy(GetMeshHis("ey", "Ey", "Electric field y"));
+   fMeshValue->SetEz(GetMeshHis("ez", "Ez", "Electric field z"));
    
-   fFieldValue->SetBx(GetFieldHis("bx", "Bx", "Magnetic field x"));
-   fFieldValue->SetBy(GetFieldHis("by", "By", "Magnetic field y"));
-   fFieldValue->SetBz(GetFieldHis("bz", "Bz", "Magnetic field z"));
+   fMeshValue->SetBx(GetMeshHis("bx", "Bx", "Magnetic field x"));
+   fMeshValue->SetBy(GetMeshHis("by", "By", "Magnetic field y"));
+   fMeshValue->SetBz(GetMeshHis("bz", "Bz", "Magnetic field z"));
 
-   fFieldValue->SetJx(GetFieldHis("jx", "Jx", "Current x"));
-   fFieldValue->SetJy(GetFieldHis("jy", "Jy", "Current y"));
-   fFieldValue->SetJz(GetFieldHis("jz", "Jz", "Current z"));
+   fMeshValue->SetJx(GetMeshHis("jx", "Jx", "Current x"));
+   fMeshValue->SetJy(GetMeshHis("jy", "Jy", "Current y"));
+   fMeshValue->SetJz(GetMeshHis("jz", "Jz", "Current z"));
 }
 
-TH1 *TConverter::GetFieldHis(TString blockName, TString hisName, TString hisTitle)
+TH1 *TConverter::GetMeshHis(TString blockName, TString hisName, TString hisTitle)
 {
    TH1 *his{nullptr};
 
@@ -165,7 +165,7 @@ TH1 *TConverter::GetFieldHis(TString blockName, TString hisName, TString hisTitl
    return his;
 }
 
-void TConverter::ReadFieldGrid()
+void TConverter::ReadMeshGrid()
 {
    Int_t index = GetBlockIndex("grid");
    if(index < 0) return;

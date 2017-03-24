@@ -27,6 +27,9 @@ public:
    std::vector<TBlock *> fBlock;
 
    TString GetFileName(){return fFileName;};
+
+   Int_t GetStep() {return fStep;};
+   Double_t GetTime() {return fTime;};
    
 private:
    void LoadBlocks();
@@ -42,6 +45,9 @@ private:
    Int_t fBlockHeaderLength;
    Long_t fNextBlockLocation; // seek position
    Int_t fNBlocks;
+
+   Int_t fStep;
+   Double_t fTime;
 };
 
 // Constants for block, meta data and data

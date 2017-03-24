@@ -23,16 +23,17 @@ file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hpp)
 # dictionary
 #
 set(SDF2ROOT_SRCS
-  src/TFieldValue.cpp
+  src/TMeshValue.cpp
 )
 
 # fill list of header files 
 set(SDF2ROOT_HEADERS
-  include/TFieldValue.hpp
+  include/TMeshValue.hpp
+  include/TMacroParticle.hpp
 )
 
-set(SDF2ROOT_LINKDEF include/SDF2ROOTLinkDef.h )
-set(SDF2ROOT_DICTIONARY ${CMAKE_CURRENT_BINARY_DIR}/SDF2ROOTDict.cxx) 
+set(SDF2ROOT_LINKDEF include/SDF2ROOTLinkDef.hpp)
+set(SDF2ROOT_DICTIONARY ${CMAKE_CURRENT_BINARY_DIR}/SDF2ROOTDict.cpp) 
 ROOT_GENERATE_DICTIONARY("${SDF2ROOT_HEADERS}" "${SDF2ROOT_LINKDEF}"
                          "${SDF2ROOT_DICTIONARY}" "${INCLUDE_DIRECTORIES}")
 
