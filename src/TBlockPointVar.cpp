@@ -35,13 +35,12 @@ void TBlockPointVar::ReadMetadata()
    fInputFile->seekg(fMetadataLocation, std::ios::beg);
    fInputFile->read((Char_t *)&fNormFactor, sizeof(fNormFactor));
    const Int_t charSize = 32;
-   Char_t *buf = new Char_t[charSize];
+   Char_t buf[charSize];
    fInputFile->read(buf, sizeof(Char_t) * charSize);
-   fUnits = buf;
+   fUnits = TString(buf);
    fInputFile->read(buf, sizeof(Char_t) * charSize);
-   fMeshID = buf;
-   delete buf;
-   fInputFile->read((Char_t *)fNParticles, sizeof(Long64_t));
+   fMeshID = TString(buf);
+   fInputFile->read((Char_t *)&fNParticles, sizeof(Long64_t));
 }
 
 void TBlockPointVar::PrintMetadata()

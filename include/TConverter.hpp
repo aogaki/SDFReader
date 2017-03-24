@@ -33,9 +33,6 @@ private:
    TFile *fOutput;
    TTree *fTree;
    
-
-   
-   
    void SaveTree();
    
    Int_t GetBlockIndex(TString ID);
@@ -55,9 +52,10 @@ private:
 
    // Particle values
    std::vector<std::vector<TMacroParticle>> fMacroPar;
-   void FindPar();
-
    std::vector<TString> fParName;
+   void FindPar();
+   void GetParGrid();
+   void GetParData();
 };
 
 

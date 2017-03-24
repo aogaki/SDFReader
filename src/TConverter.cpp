@@ -1,8 +1,11 @@
 #include <iostream>
 
 #include "TConverter.hpp"
+#include "TBlockPlainMesh.hpp"
 #include "TBlockPlainVar.hpp"
-#include "TMacroParticle.hpp"
+#include "TBlockPointMesh.hpp"
+#include "TBlockPointVar.hpp"
+
 
 using std::cout;
 using std::endl;
@@ -20,21 +23,21 @@ TConverter::TConverter(TSDFReader *reader)
       fHisUnit[i] = "";
       fHisLabel[i] = "";
    }
+   fMeshValue = new TMeshValue();
+   fMeshValue->SetStep(fReader->GetStep());
+   fMeshValue->SetTime(fReader->GetTime());
    ReadMeshGrid();
    
    fOutput = new TFile("out.root", "RECREATE");
    fTree= new TTree("EPOCH", "EPOCH simulation data");
-   fMeshValue = new TMeshValue();
-   fTree->Branch("MeshValue", fMeshValue);
 
-   
-   //fMeshValue = new TMeshValue();
+   FindPar();
+   GetParGrid();
 }
 
 TConverter::~TConverter()
 {
    SaveTree();
-
    fOutput->Close();
    
    delete fMeshValue;
@@ -152,7 +155,7 @@ TH1 *TConverter::GetMeshHis(TString blockName, TString hisName, TString hisTitle
       for(Int_t x = 1; x <= nBins[0]; x++){
          for(Int_t y = 1; y <= nBins[1]; y++){
             for(Int_t z = 1; z <= nBins[2]; z++){
-               Int_t i = (x - 1) + ((y - 1) * nBins[0]) + ((y - 1) * nBins[0] * nBins[1]);
+               Int_t i = (x - 1) + ((y - 1) * nBins[0]) + ((z - 1) * nBins[0] * nBins[1]);
                his->SetBinContent(x, y, z, norm * block->GetData(i));
             }
          }
@@ -185,13 +188,13 @@ void TConverter::ReadMeshGrid()
    block->ReadData();
    fHisBinWidth[0] = fabs(block->GetData(1) - block->GetData(0));
    if(nGrids[1] > 1) fHisBinWidth[1] = fabs(block->GetData(1 + nGrids[0]) - block->GetData(nGrids[0]));
-   if(nGrids[2] > 1) fHisBinWidth[2] = fabs(block->GetData(1 + nGrids[0] * nGrids[1])
-                                            - block->GetData(nGrids[0] * nGrids[1]));
+   if(nGrids[2] > 1) fHisBinWidth[2] = fabs(block->GetData(1 + nGrids[0] + nGrids[1])
+                                            - block->GetData(nGrids[0] + nGrids[1]));
 }
 
 void TConverter::SaveTree()
 {
-   fTree->Fill();
+   fMeshValue->Write("MeshValue");
    fTree->Write();
 }
 
@@ -201,4 +204,36 @@ Int_t TConverter::GetBlockIndex(TString ID)
       if(ID == fReader->fBlock[i]->GetID()) return i;
 
    return -1;
+}
+
+void TConverter::FindPar()
+{
+   // Using CPU split information.
+   // Unfortunately, I don't know what is the CPU split information.
+   // But, this shows the particle names
+   for(Int_t i = 0; i < fReader->GetNBlocks(); i++){
+      TString id = fReader->fBlock[i]->GetID();
+      if(id.Contains("cpu/")){
+         id.Remove(0, 4); // 4 means size of "cpu/"
+         fParName.push_back(id);
+      }
+   }
+}
+
+void TConverter::GetParGrid()
+{
+   Int_t i = 0;
+   
+   Int_t index = GetBlockIndex("grid/" + fParName[i]);
+   if(index < 0) return;
+
+   cout << index << endl;
+   
+   TBlockPointMesh *block = (TBlockPointMesh*)fReader->fBlock[index];
+   block->ReadMetadata();
+   block->ReadData();
+   
+   block->PrintHeader();
+   block->PrintMetadata();
+
 }

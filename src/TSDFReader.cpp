@@ -12,6 +12,7 @@
 #include "TBlockPlainMesh.hpp"
 #include "TBlockPlainVar.hpp"
 #include "TBlockPointMesh.hpp"
+#include "TBlockPointVar.hpp"
 
 
 using std::cout;
@@ -145,6 +146,17 @@ void TSDFReader::LoadBlocks(){
          case c_blocktype_plain_variable:
             fBlock.push_back(new TBlockPlainVar(fInputFile, fNextBlockLocation,
                                                 fStringLength, fBlockHeaderLength));
+            fBlock[i + 1]->ReadMetadata();
+            break;
+         case c_blocktype_point_mesh:
+            fBlock.push_back(new TBlockPointMesh(fInputFile, fNextBlockLocation,
+                                                 fStringLength, fBlockHeaderLength));
+            fBlock[i + 1]->ReadMetadata();
+            break;
+         case c_blocktype_point_variable:
+            fBlock.push_back(new TBlockPointVar(fInputFile, fNextBlockLocation,
+                                                fStringLength, fBlockHeaderLength));
+            fBlock[i + 1]->PrintHeader();
             fBlock[i + 1]->ReadMetadata();
             break;
          case c_blocktype_run_info:

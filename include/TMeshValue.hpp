@@ -18,6 +18,12 @@ public:
    ~TMeshValue();
 
    ClassDef(TMeshValue, 1);
+
+   void SetStep(Int_t i) {fStep = i;};
+   Int_t GetStep() {return fStep;};
+   
+   void SetTime(Double_t t) {fTime = t;};
+   Double_t GetTime() {return fTime;};
    
    void SetEx(TH1 *his) {fEx = his;};
    TH1 *GetEx() {return fEx;};
@@ -41,6 +47,9 @@ public:
    TH1 *GetJz() {return fJz;};
    
 private:
+   Int_t fStep;
+   Double_t fTime;
+   
    // TH1D, TH2D, or TH3D
    TH1 *fEx;
    TH1 *fEy;

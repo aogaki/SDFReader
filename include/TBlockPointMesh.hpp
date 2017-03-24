@@ -17,6 +17,12 @@ public:
    void ReadMetadata();
    void PrintMetadata();
 
+   Long64_t GetNParticles() {return fNParticles;};
+   Double_t GetMinVal(Int_t i) {return fMinVal[i] * fNormFactor[i];};
+   Double_t GetMaxVal(Int_t i) {return fMaxVal[i] * fNormFactor[i];};
+   TString GetAxisLabel(Int_t i) {return fAxisLabel[i];};
+   TString GetUnits(Int_t i) {return fUnits[i];};
+   
 private:
    Double_t fNormFactor[3];
    TString fAxisLabel[3];

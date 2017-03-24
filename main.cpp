@@ -10,7 +10,7 @@ using std::endl;
 int main(int argc, char **argv)
 {
    //TString fileName = "Data/0006.sdf";
-   TString fileName = "Data/0030.sdf";
+   TString fileName = "Data/0010.sdf";
 
    if(argc == 2) fileName = argv[1];
    

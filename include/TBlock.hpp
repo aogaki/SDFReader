@@ -33,8 +33,8 @@ public:
    Int_t GetDataType(){return fDataType;};
    Int_t GetNDims(){return fNDims;};
 
-   Double_t GetData(Int_t i){return fData[i];};
    Int_t GetDataSize(){return fData.size();};
+   Double_t GetData(Int_t i);
    
 protected:
    // For header and general information

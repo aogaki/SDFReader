@@ -39,22 +39,21 @@ void TBlockPointMesh::ReadMetadata()
 {
    fInputFile->seekg(fMetadataLocation, std::ios::beg);
    fInputFile->read((Char_t *)fNormFactor, sizeof(Double_t) * fNDims);
+   const Int_t charSize = 32;
    for(Int_t i = 0; i < fNDims; i++){
-      Char_t *buf = new Char_t[32];
-      fInputFile->read(buf, sizeof(Char_t) * 32);
-      fAxisLabel[i] = buf;
-      delete buf;
+      Char_t buf[charSize];
+      fInputFile->read(buf, sizeof(Char_t) * charSize);
+      fAxisLabel[i] = TString(buf);
    }
    for(Int_t i = 0; i < fNDims; i++){
-      Char_t *buf = new Char_t[32];
-      fInputFile->read(buf, sizeof(Char_t) * 32);
-      fUnits[i] = buf;
-      delete buf;  
+      Char_t buf[charSize];
+      fInputFile->read(buf, sizeof(Char_t) * charSize);
+      fUnits[i] = TString(buf);
    }
    fInputFile->read((Char_t *)&fGeoType, sizeof(Int_t));
    fInputFile->read((Char_t *)fMinVal, sizeof(Double_t) * fNDims);
    fInputFile->read((Char_t *)fMaxVal, sizeof(Double_t) * fNDims);
-   fInputFile->read((Char_t *)fNParticles, sizeof(Long64_t));
+   fInputFile->read((Char_t *)&fNParticles, sizeof(Long64_t));
 }
 
 void TBlockPointMesh::PrintMetadata()

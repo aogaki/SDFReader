@@ -131,3 +131,11 @@ void TBlock::ReadData32()
    }
 }
 
+Double_t TBlock::GetData(Int_t i)
+{
+   if(i < fData.size())
+      return fData[i];
+   else std::cerr << "GetData@TBlock, out of range" << std::endl;
+   return 0.;
+};
+
