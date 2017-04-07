@@ -223,3 +223,12 @@ Int_t TSDFReader::GetNextBlockType()
 
    return blockType;
 }
+
+Int_t TSDFReader::GetBlockIndex(TString ID)
+{
+   for(Int_t i = 0; i < GetNBlocks(); i++)
+      if(ID == fBlock[i]->GetID()) return i;
+
+   return -1;
+}
+

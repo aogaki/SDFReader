@@ -30,6 +30,8 @@ public:
 
    Int_t GetStep() {return fStep;};
    Double_t GetTime() {return fTime;};
+
+   Int_t GetBlockIndex(TString ID);
    
 private:
    void LoadBlocks();

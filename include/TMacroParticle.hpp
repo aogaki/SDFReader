@@ -1,7 +1,7 @@
 #ifndef TMACROPARTICLE
 #define TMACROPARTICLE 1
 /*
-    Macroparticle data class.  
+    Macroparticle tree class.  
 */
 
 #include <vector>
@@ -14,8 +14,6 @@ class TMacroParticle: public TObject
 public:
    TMacroParticle(){};
    ~TMacroParticle(){};
-
-   ClassDef(TMacroParticle, 1);
 
    void SetWeight(Double_t weight) {fWeight = weight;};
    Double_t GetWeight() {return fWeight;};

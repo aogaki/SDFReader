@@ -19,38 +19,10 @@ file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cpp)
 file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hpp)
 
 #----------------------------------------------------------------------------
-# set everything needed for the root dictonary and create the
-# dictionary
-#
-set(SDF2ROOT_SRCS
-  src/TMeshValue.cpp
-)
-
-# fill list of header files 
-set(SDF2ROOT_HEADERS
-  include/TMeshValue.hpp
-  include/TMacroParticle.hpp
-)
-
-set(SDF2ROOT_LINKDEF include/SDF2ROOTLinkDef.hpp)
-set(SDF2ROOT_DICTIONARY ${CMAKE_CURRENT_BINARY_DIR}/SDF2ROOTDict.cpp) 
-ROOT_GENERATE_DICTIONARY("${SDF2ROOT_HEADERS}" "${SDF2ROOT_LINKDEF}"
-                         "${SDF2ROOT_DICTIONARY}" "${INCLUDE_DIRECTORIES}")
-
-# add the dictionary to the list of source files
-set(SDF2ROOT_SRCS ${SDF2ROOT_SRCS} ${SDF2ROOT_DICTIONARY}) 
-
-#----------------------------------------------------------------------------
-# Generating library
-#
-add_library(SDF2ROOT SHARED ${SDF2ROOT_SRCS})
-target_link_libraries(SDF2ROOT ${ROOT_LIBRARIES})
-
-#----------------------------------------------------------------------------
 # Generating executable file and linking
 #
 add_executable(sdf2root main.cpp ${sources} ${headers})
-target_link_libraries(sdf2root ${ROOT_LIBRARIES} SDF2ROOT)
+target_link_libraries(sdf2root ${ROOT_LIBRARIES})
 
 #----------------------------------------------------------------------------
 # Install the executable to 'bin' directory under CMAKE_INSTALL_PREFIX
