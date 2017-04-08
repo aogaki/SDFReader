@@ -24,6 +24,9 @@ public:
 
    virtual void ReadData();
    virtual void PrintData(){for(auto v: fData) std::cout << v << std::endl;};
+  virtual Int_t GetDataSize(){return fData.size();};
+  virtual Double_t GetData(Int_t i);
+   
 
    //Int_t GetDataSize(){return fDataSize;};
 
@@ -33,9 +36,6 @@ public:
    Int_t GetDataType(){return fDataType;};
    Int_t GetNDims(){return fNDims;};
 
-   Int_t GetDataSize(){return fData.size();};
-   Double_t GetData(Int_t i);
-   
 protected:
    // For header and general information
    std::ifstream *fInputFile;

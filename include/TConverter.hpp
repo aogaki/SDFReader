@@ -22,7 +22,7 @@
 class TConverter
 {
 public:
-   TConverter(TSDFReader *reader);
+  TConverter(TSDFReader *reader, TString outName);
    ~TConverter();
 
    void GetData();

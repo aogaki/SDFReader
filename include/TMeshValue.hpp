@@ -15,7 +15,7 @@
 
 #include "TSDFReader.hpp"
 
-class TMeshValue: public TObject
+class TMeshValue
 {
 public:
    TMeshValue(TSDFReader *reader);

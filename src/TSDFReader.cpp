@@ -156,7 +156,6 @@ void TSDFReader::LoadBlocks(){
          case c_blocktype_point_variable:
             fBlock.push_back(new TBlockPointVar(fInputFile, fNextBlockLocation,
                                                 fStringLength, fBlockHeaderLength));
-            fBlock[i + 1]->PrintHeader();
             fBlock[i + 1]->ReadMetadata();
             break;
          case c_blocktype_run_info:

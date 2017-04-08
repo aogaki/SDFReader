@@ -1,16 +1,13 @@
 #include <iostream>
 
 #include "TConverter.hpp"
-#include "TBlockPlainMesh.hpp"
-#include "TBlockPlainVar.hpp"
-#include "TBlockPointMesh.hpp"
-#include "TBlockPointVar.hpp"
+#include "TMacroParticle.hpp"
 
 
 using std::cout;
 using std::endl;
 
-TConverter::TConverter(TSDFReader *reader)
+TConverter::TConverter(TSDFReader *reader, TString outputName)
    : fReader(reader),
      fOutput(nullptr),
      fMeshValue(nullptr)
@@ -18,7 +15,7 @@ TConverter::TConverter(TSDFReader *reader)
    fMeshValue = new TMeshValue(fReader);
    fMeshValue->ReadMeshGrid();
    
-   fOutput = new TFile("out.root", "RECREATE");
+   fOutput = new TFile(outputName, "RECREATE");
 
    FindPar();
 }
@@ -33,11 +30,17 @@ TConverter::~TConverter()
 void TConverter::GetData()
 {
    // Mesh data
-   //fMeshValue->GetMeshData();
-   //fMeshValue->Save();
+  fMeshValue->GetMeshData();
+  fMeshValue->Save();
 
    // Particle data
-   for(auto name: fParName) cout << name << endl;
+  for(auto name: fParName){
+    cout << name << endl;
+    TMacroParticle *par = new TMacroParticle(fReader, name);
+    par->MakeTree();
+   
+    delete par;
+  }
 }
 
 void TConverter::FindPar()
