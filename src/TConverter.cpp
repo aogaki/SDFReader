@@ -1,5 +1,7 @@
 #include <iostream>
 
+#include <TVector.h>
+
 #include "TConverter.hpp"
 #include "TMacroParticle.hpp"
 
@@ -17,6 +19,11 @@ TConverter::TConverter(TSDFReader *reader, TString outputName)
    
    fOutput = new TFile(outputName, "RECREATE");
 
+   // Save time info
+   TVectorD time(1);
+   time[0] = fReader->GetTime();
+   time.Write("Time");
+   
    FindPar();
 }
 
@@ -34,6 +41,7 @@ void TConverter::GetData()
   fMeshValue->Save();
 
    // Particle data
+  /*
   for(auto name: fParName){
     cout << name << endl;
     TMacroParticle *par = new TMacroParticle(fReader, name);
@@ -41,6 +49,7 @@ void TConverter::GetData()
    
     delete par;
   }
+  */
 }
 
 void TConverter::FindPar()
