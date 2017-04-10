@@ -41,7 +41,7 @@ void TBlockPlainVar::ReadMetadata()
    fUnits = buf;
    fInputFile->read(buf, sizeof(Char_t) * charSize);
    fMeshID = buf;
-   delete buf;
+   delete[] buf;
    fInputFile->read((Char_t *)fNGrids, sizeof(Int_t) * fNDims);
    fInputFile->read((Char_t *)&fStagger, sizeof(fStagger));
 }

@@ -66,7 +66,7 @@ void TBlock::ReadHeader()
    Char_t *buf1 = new Char_t[32];
    fInputFile->read(buf1, sizeof(Char_t) * 32);
    fBlockID = buf1;
-   delete buf1;
+   delete[] buf1;
    fInputFile->read((Char_t *)&fDataLength, sizeof(fDataLength));
    fInputFile->read((Char_t *)&fBlockType, sizeof(fBlockType));
    fInputFile->read((Char_t *)&fDataType, sizeof(fDataType));
@@ -74,7 +74,7 @@ void TBlock::ReadHeader()
    Char_t *buf2 = new Char_t[fStringLength];
    fInputFile->read(buf2, sizeof(Char_t) * fStringLength);
    fBlockName = buf2;
-   delete buf2;
+   delete[] buf2;
    fInputFile->read((Char_t *)&fBlockInfoLength, sizeof(fBlockInfoLength));
 }
 

@@ -43,13 +43,13 @@ void TBlockPlainMesh::ReadMetadata()
       Char_t *buf = new Char_t[32];
       fInputFile->read(buf, sizeof(Char_t) * 32);
       fAxisLabel[i] = buf;
-      delete buf;
+      delete[] buf;
    }
    for(Int_t i = 0; i < fNDims; i++){
       Char_t *buf = new Char_t[32];
       fInputFile->read(buf, sizeof(Char_t) * 32);
       fUnits[i] = buf;
-      delete buf;  
+      delete[] buf;  
    }
    fInputFile->read((Char_t *)&fGeoType, sizeof(Int_t));
    fInputFile->read((Char_t *)fMinVal, sizeof(Double_t) * fNDims);
