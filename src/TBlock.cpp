@@ -33,7 +33,7 @@ TBlock::TBlock()
 }
 
 TBlock::TBlock(std::ifstream *file, Long_t location,
-                     Int_t stringLength, Int_t headerLength)
+               Int_t stringLength, Int_t headerLength)
 {
    fInputFile = file;
    fBlockLocation = location;
@@ -76,6 +76,7 @@ void TBlock::ReadHeader()
    fBlockName = buf2;
    delete[] buf2;
    fInputFile->read((Char_t *)&fBlockInfoLength, sizeof(fBlockInfoLength));
+
 }
 
 void TBlock::PrintHeader()
@@ -112,8 +113,6 @@ void TBlock::ReadData()
 void TBlock::ReadData64()
 {
    Double_t buf;
-   fDataSize = fDataLength / 8;
-
    for(Int_t i = 0; i < fDataSize; i++){
       fInputFile->read((Char_t *)&buf, sizeof(buf));
       fData.push_back(buf);
@@ -123,8 +122,6 @@ void TBlock::ReadData64()
 void TBlock::ReadData32()
 {
    Float_t buf;
-   fDataSize = fDataLength / 4;
-
    for(Int_t i = 0; i < fDataSize; i++){
       fInputFile->read((Char_t *)&buf, sizeof(buf));
       fData.push_back(Double_t(buf));

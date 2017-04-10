@@ -33,6 +33,15 @@ TBlockPointMesh::TBlockPointMesh(std::ifstream *file, Long_t location,
    }
    
    ReadHeader();
+
+
+   if(fDataType == 4) fDataSize = fDataLength / sizeof(Double_t);
+   else if(fDataType == 3) fDataSize = fDataLength / sizeof(Float_t);
+   else{
+      cout << "DataType error in GetHeader@BlockPointMesh" << endl;
+      cout << "Now, only double and float data types are implemented" << endl;
+      exit(0);
+   }
 }
 
 void TBlockPointMesh::ReadMetadata()
@@ -54,6 +63,7 @@ void TBlockPointMesh::ReadMetadata()
    fInputFile->read((Char_t *)fMinVal, sizeof(Double_t) * fNDims);
    fInputFile->read((Char_t *)fMaxVal, sizeof(Double_t) * fNDims);
    fInputFile->read((Char_t *)&fNParticles, sizeof(Long64_t));
+
 }
 
 void TBlockPointMesh::PrintMetadata()
@@ -80,4 +90,34 @@ void TBlockPointMesh::PrintMetadata()
         << fMaxVal[1] <<"\t"
         << fMaxVal[2] << endl;
    cout << "No. Particles: " << fNParticles << endl;
+}
+
+void TBlockPointMesh::ReadData()
+{} // Do nothing
+
+Double_t TBlockPointMesh::GetData(Int_t i)
+{
+   if(fDataType == 4) return GetData64(i);
+   else if(fDataType == 3) return GetData32(i);
+   else{
+      cout << "DataType error in ReadData@BlockPlaneMesh" << endl;
+      cout << "Now, only double and float data types are implemented" << endl;
+      exit(0);
+   }
+}
+
+Double_t TBlockPointMesh::GetData32(Int_t i)
+{
+   Float_t buf;
+   fInputFile->seekg(fDataLocation + i * sizeof(buf), std::ios::beg);
+   fInputFile->read((Char_t *)&buf, sizeof(buf));
+   return buf;
+}
+
+Double_t TBlockPointMesh::GetData64(Int_t i)
+{
+   Double_t buf;
+   fInputFile->seekg(fDataLocation + i * sizeof(buf), std::ios::beg);
+   fInputFile->read((Char_t *)&buf, sizeof(buf));
+   return buf;
 }

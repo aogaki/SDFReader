@@ -24,8 +24,8 @@ public:
 
    virtual void ReadData();
    virtual void PrintData(){for(auto v: fData) std::cout << v << std::endl;};
-  virtual Int_t GetDataSize(){return fData.size();};
-  virtual Double_t GetData(Int_t i);
+   virtual Int_t GetDataSize(){return fDataSize;};
+   virtual Double_t GetData(Int_t i);
    
 
    //Int_t GetDataSize(){return fDataSize;};

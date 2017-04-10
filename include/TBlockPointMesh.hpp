@@ -17,6 +17,9 @@ public:
    void ReadMetadata();
    void PrintMetadata();
 
+   void ReadData();
+   Double_t GetData(Int_t i);
+   
    Long64_t GetNParticles() {return fNParticles;};
    Double_t GetMinVal(Int_t i) {return fMinVal[i] * fNormFactor[i];};
    Double_t GetMaxVal(Int_t i) {return fMaxVal[i] * fNormFactor[i];};
@@ -31,6 +34,9 @@ private:
    Double_t fMinVal[3];
    Double_t fMaxVal[3];
    Long64_t fNParticles;
+
+   Double_t GetData64(Int_t i);
+   Double_t GetData32(Int_t i);
    
 };
 

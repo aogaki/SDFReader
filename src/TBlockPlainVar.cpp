@@ -29,6 +29,15 @@ TBlockPlainVar::TBlockPlainVar(std::ifstream *file, Long_t location,
    fDataSize = 0;
    
    ReadHeader();
+
+
+   if(fDataType == 4) fDataSize = fDataLength / sizeof(Double_t);
+   else if(fDataType == 3) fDataSize = fDataLength / sizeof(Float_t);
+   else{
+      cout << "DataType error in GetHeader@BlockPlaneVar" << endl;
+      cout << "Now, only double and float data types are implemented" << endl;
+      exit(0);
+   }
 }
 
 void TBlockPlainVar::ReadMetadata()

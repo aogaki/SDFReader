@@ -102,6 +102,7 @@ void TMacroParticle::MakeTree()
   tree->Branch("Weight", &Weight, "Weight/D");
 
   const Long64_t kNoPar = fPx->GetDataSize();
+  cout << kNoPar << endl;
   for(Long64_t i = 0; i < kNoPar; i++){
     if(fPx) Px = fPx->GetData(i);
     if(fPy) Py = fPy->GetData(i);
