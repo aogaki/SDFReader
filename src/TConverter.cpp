@@ -41,7 +41,6 @@ void TConverter::GetData()
   fMeshValue->Save();
 
    // Particle data
-  /*
   for(auto name: fParName){
     cout << name << endl;
     TMacroParticle *par = new TMacroParticle(fReader, name);
@@ -49,7 +48,6 @@ void TConverter::GetData()
    
     delete par;
   }
-  */
 }
 
 void TConverter::FindPar()
