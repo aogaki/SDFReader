@@ -9,6 +9,7 @@ SDF2ROOTDict.cpp
 sdf2root
 Makefile
 *.root
+*.sdf
 *.pcm
 *.so
 *.d
