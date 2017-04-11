@@ -141,76 +141,33 @@ void TSDFReader::LoadBlocks(){
          case c_blocktype_plain_mesh:
             fBlock.push_back(new TBlockPlainMesh(fInputFile, fNextBlockLocation,
                                                  fStringLength, fBlockHeaderLength));
-            fBlock[i + 1]->ReadMetadata();
             break;
          case c_blocktype_plain_variable:
             fBlock.push_back(new TBlockPlainVar(fInputFile, fNextBlockLocation,
                                                 fStringLength, fBlockHeaderLength));
-            fBlock[i + 1]->ReadMetadata();
             break;
          case c_blocktype_point_mesh:
             fBlock.push_back(new TBlockPointMesh(fInputFile, fNextBlockLocation,
                                                  fStringLength, fBlockHeaderLength));
-            fBlock[i + 1]->ReadMetadata();
             break;
          case c_blocktype_point_variable:
             fBlock.push_back(new TBlockPointVar(fInputFile, fNextBlockLocation,
                                                 fStringLength, fBlockHeaderLength));
-            fBlock[i + 1]->ReadMetadata();
             break;
          case c_blocktype_run_info:
             fBlock.push_back(new TBlock(fInputFile, fNextBlockLocation,
                                         fStringLength, fBlockHeaderLength));
-            fBlock[i + 1]->ReadMetadata();
             break;
          default:
             fBlock.push_back(new TBlock(fInputFile, fNextBlockLocation,
                                         fStringLength, fBlockHeaderLength));
-            fBlock[i + 1]->ReadMetadata();
             break;
       }
+            fBlock[i + 1]->ReadMetadata();
+            fBlock[i + 1]->PrintHeader();
+            fBlock[i + 1]->PrintMetadata();
    }
 
-/*
-   switch(blockType){
-      case c_blocktype_scrubbed:
-         break;
-      case c_blocktype_null:
-         break;
-      case c_blocktype_point_mesh:
-         break;
-      case c_blocktype_plain_variable:
-         fBlock[i] = new TBlockPlainVar(fInputFile, fNextBlockLocation,
-                                                     fStringLength, fBlockHeaderLength);
-         break;
-      case c_blocktype_point_variable:
-         break;
-      case c_blocktype_constant:
-         break;
-      case c_blocktype_array:
-         break;
-      case c_blocktype_run_info:
-         fBlock[i] = new TBlock(fInputFile, fNextBlockLocation,
-                                             fStringLength, fBlockHeaderLength);
-         break;
-      case c_blocktype_source:
-         break;
-      case c_blocktype_stitched_tensor:
-         break;
-      case c_blocktype_stitched_material:
-         break;
-      case c_blocktype_stitched_matvar:
-         break;
-      case c_blocktype_stitched_species:
-         break;
-      case c_blocktype_species:
-         break;
-      default:
-         fBlock[i] = new TBlock(fInputFile, fNextBlockLocation,
-                                             fStringLength, fBlockHeaderLength);
-         break;
-   }
-*/
 }
 
 Int_t TSDFReader::GetNextBlockType()

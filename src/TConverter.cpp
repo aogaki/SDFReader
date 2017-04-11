@@ -52,13 +52,12 @@ void TConverter::GetData()
 
 void TConverter::FindPar()
 {
-   // Using CPU split information.
-   // Unfortunately, I don't know what is the CPU split information.
-   // But, this shows the particle names
+   // Using Px for finding particles.
+   // In case of not recording Px, what is the best?
    for(Int_t i = 0; i < fReader->GetNBlocks(); i++){
       TString id = fReader->fBlock[i]->GetID();
-      if(id.Contains("cpu/")){
-         id.Remove(0, 4); // 4 means size of "cpu/"
+      if(id.Contains("px/")){
+         id.Remove(0, 3); // 4 means size of "px/"
          fParName.push_back(id);
       }
    }
