@@ -43,7 +43,7 @@ void TSDFReader::ReadFileHeader()
    Char_t sdf[4];
    fInputFile->read(sdf, sizeof(Char_t) * 4);
    cout << "sdf = " << sdf << endl;
-   if(TString(sdf) != "SDF1") {
+   if(!TString(sdf).Contains("SDF1")) { // Using contains for safety.
       std::cerr << "file " << fFileName << " is not SDF file" << endl;
       exit(0);
    }
