@@ -14,34 +14,38 @@
 class TMacroParticle
 {
 public:
-  TMacroParticle(TSDFReader *reader, TString parName);
+   TMacroParticle(TSDFReader *reader, TString parName);
    ~TMacroParticle();
 
-  void MakeTree();
+   void MakeTree();
   
 private:
-  TSDFReader *fReader;
-  TString fParName;
+   TSDFReader *fReader;
+   TString fParName;
 
-  // position information
-  void FindMesh();
-  TBlockPointMesh *fGrid;
+   // position information
+   void FindMesh();
+   TBlockPointMesh *fGrid;
 
-  // particle parameters
-  void FindVar();
-  TBlockPointVar *FindBlockPointVar(TString id);
+   // particle parameters
+   void FindVar();
+   TBlockPointVar *FindBlockPointVar(TString id);
  
-  TBlockPointVar *fPx;
-  TBlockPointVar *fPy;
-  TBlockPointVar *fPz;
+   TBlockPointVar *fPx;
+   TBlockPointVar *fPy;
+   TBlockPointVar *fPz;
   
-  TBlockPointVar *fVx;
-  TBlockPointVar *fVy;
-  TBlockPointVar *fVz;
+   TBlockPointVar *fVx;
+   TBlockPointVar *fVy;
+   TBlockPointVar *fVz;
 
-  TBlockPointVar *fEk; // What is the E? this block shows the kinetic ene.
+   TBlockPointVar *fEk; // What is the E? this block shows the kinetic ene.
 
-  TBlockPointVar *fWeight;
+   TBlockPointVar *fWeight;
+
+   TBlockPointVar *fOptDep;
+
+   TBlockPointVar *fQEDEne;
 };
 
 #endif

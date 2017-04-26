@@ -35,11 +35,11 @@ int main(int argc, char **argv)
            << block->GetID() <<"\t"
            << endl;
    }
-  
+
    TConverter *converter = new TConverter(reader, outputName);
    converter->GetData();
-
    delete converter;
+
    delete reader;
 
    return 0;

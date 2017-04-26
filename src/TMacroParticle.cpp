@@ -19,7 +19,9 @@ TMacroParticle::TMacroParticle(TSDFReader *reader, TString parName)
     fVy(nullptr),
     fVz(nullptr),
     fEk(nullptr),
-    fWeight(nullptr)
+    fWeight(nullptr),
+    fOptDep(nullptr),
+    fQEDEne(nullptr)
 {
   FindMesh();
   FindVar();
@@ -51,6 +53,10 @@ void TMacroParticle::FindVar()
   fEk = FindBlockPointVar("ek/" + fParName);
 
   fWeight = FindBlockPointVar("weight/" + fParName);
+
+  fOptDep = FindBlockPointVar("optical depth/" + fParName);
+
+  fQEDEne = FindBlockPointVar("qed energy/" + fParName);
 }
 
 TBlockPointVar *TMacroParticle::FindBlockPointVar(TString id)
@@ -101,26 +107,42 @@ void TMacroParticle::MakeTree()
   Double_t Weight;
   tree->Branch("Weight", &Weight, "Weight/D");
 
+  // Optical depth
+  Double_t optDep;
+  tree->Branch("OptDep", &optDep, "OptDep/D");
+
+  // QED energy
+  Double_t QEDEne;
+  tree->Branch("QEDEne", &QEDEne, "QEDEne/D");
+
+
   const Long64_t kNoPar = fPx->GetDataSize();
   cout << kNoPar << endl;
   for(Long64_t i = 0; i < kNoPar; i++){
-    if(fPx) Px = fPx->GetData(i);
-    if(fPy) Py = fPy->GetData(i);
-    if(fPz) Pz = fPz->GetData(i);
+     if(i % 1000000 == 0) cout << i <<" / "<< kNoPar << endl;
+     
+     if(fPx) Px = fPx->GetData(i);
+     if(fPy) Py = fPy->GetData(i);
+     if(fPz) Pz = fPz->GetData(i);
     
-    if(fVx) Vx = fVx->GetData(i);
-    if(fVy) Vy = fVy->GetData(i);
-    if(fVz) Vz = fVz->GetData(i);
+     if(fVx) Vx = fVx->GetData(i);
+     if(fVy) Vy = fVy->GetData(i);
+     if(fVz) Vz = fVz->GetData(i);
     
-    if(fEk) Ek = fEk->GetData(i);
-    if(fWeight) Weight = fWeight->GetData(i);
+     if(fEk) Ek = fEk->GetData(i);
 
-    if(fGrid){
-      x = fGrid->GetData(i);
-      if(fGrid->GetNDims() > 1) y = fGrid->GetData(i + kNoPar);
-      if(fGrid->GetNDims() > 2) z = fGrid->GetData(i + kNoPar + kNoPar);
-    }
-    tree->Fill();
+     if(fWeight) Weight = fWeight->GetData(i);
+
+     if(fOptDep) optDep = fOptDep->GetData(i);
+     
+     if(fQEDEne) QEDEne = fQEDEne->GetData(i);
+
+     if(fGrid){
+        x = fGrid->GetData(i);
+        if(fGrid->GetNDims() > 1) y = fGrid->GetData(i + kNoPar);
+        if(fGrid->GetNDims() > 2) z = fGrid->GetData(i + kNoPar + kNoPar);
+     }
+     tree->Fill();
   }
 
   tree->Write();
