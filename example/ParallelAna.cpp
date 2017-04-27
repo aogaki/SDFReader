@@ -16,13 +16,12 @@ void ActivatePROOF(TChain *chain, Int_t nThreads = 0)
 void ParallelAna(Int_t fileIndex = 0)
 {
    TChain *chain = new TChain("electron");
-   //chain->Add("../oz.root");
-   chain->Add("/Data/oz.root");
-
+   chain->Add("../ozgur.root");
+   
    //const Int_t kNThreads = chain->GetNtrees();
    //ActivatePROOF(chain, kNThreads);
    ActivatePROOF(chain);
    //ActivatePROOF(chain, 5);
 
-   chain->Process("electron.C+O");
+   chain->Process("MacroParticle.C+O(nullptr, 1.)");
 }

@@ -56,7 +56,8 @@ void TConverter::FindPar()
    // In case of not recording Px, what is the best?
    for(Int_t i = 0; i < fReader->GetNBlocks(); i++){
       TString id = fReader->fBlock[i]->GetID();
-      if(id.Contains("px/")){
+      TString px = id(0, 3);
+      if(px == "px/"){
          id.Remove(0, 3); // 4 means size of "px/"
          fParName.push_back(id);
       }
