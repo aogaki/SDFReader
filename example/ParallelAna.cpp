@@ -13,9 +13,9 @@ void ActivatePROOF(TChain *chain, Int_t nThreads = 0)
    chain->SetProof();
 }
 
-void ParallelAna(Int_t fileIndex = 0)
+void ParallelAna()
 {
-   TChain *chain = new TChain("electron");
+   TChain *chain = new TChain("carbon");
    chain->Add("../ozgur.root");
    
    //const Int_t kNThreads = chain->GetNtrees();
@@ -23,5 +23,5 @@ void ParallelAna(Int_t fileIndex = 0)
    ActivatePROOF(chain);
    //ActivatePROOF(chain, 5);
 
-   chain->Process("MacroParticle.C+O(nullptr, 1.)");
+   chain->Process("MacroParticle.C+O");
 }

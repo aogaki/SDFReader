@@ -38,6 +38,8 @@ void MacroParticle::Begin(TTree * /*tree*/)
    TString option = GetOption();
 
    fHisTest = nullptr;
+   //fMassFac = 1.;
+   fMassFac = 1836.2*12;
 }
 
 void MacroParticle::SlaveBegin(TTree * /*tree*/)

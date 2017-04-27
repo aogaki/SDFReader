@@ -50,7 +50,7 @@ public :
    TH2D *fHisTest;
    Double_t fMassFac; // The mass of electron is 1.  Proton is 1836.2.
    
-   MacroParticle(TTree * /*tree*/ =0, Double_t massFac = 1.) { fMassFac = massFac;}
+   MacroParticle(TTree * /*tree*/ =0) {}
    virtual ~MacroParticle() { }
    virtual Int_t   Version() const { return 2; }
    virtual void    Begin(TTree *tree);
