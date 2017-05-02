@@ -37,9 +37,9 @@ void MacroParticle::Begin(TTree * /*tree*/)
 
    TString option = GetOption();
 
-   fHisTest = nullptr;
-   //fMassFac = 1.;
-   fMassFac = 1836.2*12;
+   fHis2D = nullptr;
+   fHisEne = nullptr;
+   fHisTheta = nullptr;
 }
 
 void MacroParticle::SlaveBegin(TTree * /*tree*/)
@@ -49,12 +49,37 @@ void MacroParticle::SlaveBegin(TTree * /*tree*/)
    // The tree argument is deprecated (on PROOF 0 is passed).
 
    TString option = GetOption();
+
+   // When I use those values.  Setting in SlaveBegin is mandatory.
+   // Why?
+   fEneMax = 1000.;
+   fThetaMax = 180.;
+
+   TString eneLabel = "Kinetic energy [MeV]";
+   TString thetaLabel = "#it{#theta} [deg]";
    
-   fHisTest = new TH2D("HisTest", "Kinetic energy VS divergence",
-                       1800, 0., 180., 10000, 0., 1000.);
-   fHisTest->SetXTitle("#it{#theta} [deg]");
-   fHisTest->SetYTitle("Kinetic energy [MeV]");
-   GetOutputList()->Add(fHisTest);
+   fHis2D = new TH2D("His2D", "Kinetic energy VS divergence",
+                     Int_t(fThetaMax * 10), 0., fThetaMax, Int_t(fEneMax * 10), 0., fEneMax);
+   fHis2D->SetXTitle(thetaLabel);
+   fHis2D->SetYTitle(eneLabel);
+   GetOutputList()->Add(fHis2D);
+
+   fHisEne = new TH1D("HisEne", "", fEneMax * 10, 0., fEneMax);
+   fHisEne->SetXTitle(eneLabel);
+   fHisEne->SetYTitle("Counts");
+   GetOutputList()->Add(fHisEne);
+
+   fHisTheta = new TH1D("HisTheta", "", fThetaMax * 10, 0., fThetaMax);
+   fHisTheta->SetXTitle(thetaLabel);
+   fHisTheta->SetYTitle("Counts");
+   GetOutputList()->Add(fHisTheta);
+
+   fHis2D->GetXaxis()->CenterTitle(kTRUE);
+   fHis2D->GetYaxis()->CenterTitle(kTRUE);
+   fHisEne->GetXaxis()->CenterTitle(kTRUE);
+   fHisEne->GetYaxis()->CenterTitle(kTRUE);
+   fHisTheta->GetXaxis()->CenterTitle(kTRUE);
+   fHisTheta->GetYaxis()->CenterTitle(kTRUE);
 }
 
 Bool_t MacroParticle::Process(Long64_t entry)
@@ -80,7 +105,12 @@ Bool_t MacroParticle::Process(Long64_t entry)
    fP[1] = *Py;
    fP[2] = *Px;
    Double_t ene = GetEne();
-   if(ene > 0.) fHisTest->Fill(GetTheta() * 180 / TMath::Pi(), GetEne(), *Weight);
+   if(ene > 0.){
+      Double_t theta = GetTheta() * 180 / TMath::Pi();
+      fHis2D->Fill(theta, ene, *Weight);
+      fHisEne->Fill(ene, *Weight);
+      fHisTheta->Fill(theta, *Weight);
+   }
    return kTRUE;
 }
 
@@ -98,7 +128,9 @@ void MacroParticle::Terminate()
    // a query. It always runs on the client, it can be used to present
    // the results graphically or save the results to file.
    TFile *file = new TFile("tmp.root", "RECREATE");
-   fHisTest->Write();
+   fHis2D->Write();
+   fHisEne->Write();
+   fHisTheta->Write();
    file->Close();
 }
 
@@ -108,7 +140,7 @@ Double_t MacroParticle::GetEne() const
    if(magP == 0.) return 0.;
 
    constexpr Double_t c2 = kgLightSpeed*kgLightSpeed;
-   constexpr Double_t mass = kgElectronMass;
+   constexpr Double_t mass = kgElectronMass * kgMassFactor;
    Double_t K = sqrt(mass*mass * c2*c2 + magP * c2) - mass * c2; // in J
 
    constexpr Double_t MeV = 6.241509e12;

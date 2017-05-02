@@ -121,6 +121,8 @@ void TMeshValue::GetMeshData()
    fJx = GetMeshHis("jx", "Jx", "Current x");
    fJy = GetMeshHis("jy", "Jy", "Current y");
    fJz = GetMeshHis("jz", "Jz", "Current z");
+
+   fNumberDensity = GetMeshHis("number_density/electron", "number_density", "Number density");
 }
 
 TH1 *TMeshValue::GetMeshHis(TString blockName, TString hisName, TString hisTitle)

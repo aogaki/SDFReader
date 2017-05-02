@@ -22,7 +22,7 @@
 class TConverter
 {
 public:
-  TConverter(TSDFReader *reader, TString outName);
+   TConverter(TSDFReader *reader, TString outName, TString targetName);
    ~TConverter();
 
    void GetData();
@@ -38,6 +38,7 @@ private:
    // Particle values
    std::vector<std::vector<TMacroParticle>> fMacroPar;
    std::vector<TString> fParName;
+   TString fTargetName;
    void FindPar();
    void GetParGrid();
    void GetParData();

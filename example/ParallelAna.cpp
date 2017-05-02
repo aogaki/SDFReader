@@ -7,7 +7,7 @@
 void ActivatePROOF(TChain *chain, Int_t nThreads = 0)
 {
    TProof *proof = TProof::Open("");
-   proof->SetProgressDialog(kFALSE);
+   //proof->SetProgressDialog(kFALSE);
    if(nThreads > 0) proof->SetParallel(nThreads);
 
    chain->SetProof();
@@ -16,7 +16,7 @@ void ActivatePROOF(TChain *chain, Int_t nThreads = 0)
 void ParallelAna()
 {
    TChain *chain = new TChain("carbon");
-   chain->Add("../ozgur.root");
+   chain->Add("../10nm.root");
    
    //const Int_t kNThreads = chain->GetNtrees();
    //ActivatePROOF(chain, kNThreads);

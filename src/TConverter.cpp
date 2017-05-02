@@ -9,7 +9,7 @@
 using std::cout;
 using std::endl;
 
-TConverter::TConverter(TSDFReader *reader, TString outputName)
+TConverter::TConverter(TSDFReader *reader, TString outputName, TString targetName = "")
    : fReader(reader),
      fOutput(nullptr),
      fMeshValue(nullptr)
@@ -25,6 +25,8 @@ TConverter::TConverter(TSDFReader *reader, TString outputName)
    time.Write("Time");
    
    FindPar();
+
+   fTargetName = targetName;
 }
 
 TConverter::~TConverter()
@@ -36,18 +38,30 @@ TConverter::~TConverter()
 
 void TConverter::GetData()
 {
-   // Mesh data
-  fMeshValue->GetMeshData();
-  fMeshValue->Save();
+   if(fTargetName == ""){
+      // Mesh data
+      fMeshValue->GetMeshData();
+      fMeshValue->Save();
 
-   // Particle data
-  for(auto name: fParName){
-    cout << name << endl;
-    TMacroParticle *par = new TMacroParticle(fReader, name);
-    par->MakeTree();
-   
-    delete par;
-  }
+      // Particle data
+      for(auto name: fParName){
+         cout << name << endl;
+         //TMacroParticle *par = new TMacroParticle(fReader, name);
+         //par->MakeTree();
+         //delete par;
+      }
+   }
+   else{
+      // Particle data
+      for(auto name: fParName){
+         if(name == fTargetName){
+            cout << name << endl;
+            TMacroParticle *par = new TMacroParticle(fReader, name);
+            par->MakeTree();
+            delete par;
+         }
+      }
+   }
 }
 
 void TConverter::FindPar()

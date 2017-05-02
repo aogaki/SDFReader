@@ -9,19 +9,21 @@ using std::endl;
 
 int main(int argc, char **argv)
 {
-  if(argc != 3){
+  if(argc != 3 && argc != 4){
     cout << "Useage" <<endl;
-    cout << "sdf2root \"input SDF file name\" \"output ROOT file name\"\n"
+    cout << "sdf2root \"input SDF file name\" \"output ROOT file name\" \"Particle name\"\n"
 	 << endl;
-    //exit(0);
+    exit(0);
   }
   
    //TString fileName = "Data/0006.sdf";
    TString inputName = "Data/0100.sdf";
    TString outputName = "out.root";
+   TString targetName = "";
    
    if(argc > 1) inputName = argv[1];
    if(argc > 2) outputName = argv[2];
+   if(argc > 3) targetName = argv[3];
    
    // Reading file information
    TSDFReader *reader = new TSDFReader(inputName);
@@ -36,7 +38,7 @@ int main(int argc, char **argv)
            << endl;
    }
 
-   TConverter *converter = new TConverter(reader, outputName);
+   TConverter *converter = new TConverter(reader, outputName, targetName);
    converter->GetData();
    delete converter;
 

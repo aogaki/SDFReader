@@ -23,6 +23,8 @@
 
 constexpr Double_t kgElectronMass = 9.10938291e-31;// These values are used in EPOCH. The unit is kg
 constexpr Double_t kgLightSpeed = 2.99792458e8;
+//constexpr Double_t kgMassFactor = 1.; // For electron
+constexpr Double_t kgMassFactor = 1836.2*12; // For carbon
 
 class MacroParticle : public TSelector {
 public :
@@ -47,8 +49,11 @@ public :
    TVector3 fP;
    Double_t GetEne() const;
    Double_t GetTheta() const;
-   TH2D *fHisTest;
-   Double_t fMassFac; // The mass of electron is 1.  Proton is 1836.2.
+   TH2D *fHis2D;
+   TH1D *fHisEne;
+   TH1D *fHisTheta;
+   Double_t fEneMax;
+   Double_t fThetaMax;
    
    MacroParticle(TTree * /*tree*/ =0) {}
    virtual ~MacroParticle() { }

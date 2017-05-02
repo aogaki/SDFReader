@@ -119,7 +119,8 @@ void TMacroParticle::MakeTree()
   const Long64_t kNoPar = fPx->GetDataSize();
   cout << kNoPar << endl;
   for(Long64_t i = 0; i < kNoPar; i++){
-     if(i % 1000000 == 0) cout << i <<" / "<< kNoPar << endl;
+     if(i % 1000000 == 0)
+        cout << i <<" / "<< kNoPar <<" ("<< i * 100. / kNoPar <<" %)"<< endl;
      
      if(fPx) Px = fPx->GetData(i);
      if(fPy) Py = fPy->GetData(i);
