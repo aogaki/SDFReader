@@ -64,7 +64,7 @@ void MacroParticle::SlaveBegin(TTree * /*tree*/)
    fHis2D->SetYTitle(eneLabel);
    GetOutputList()->Add(fHis2D);
 
-   fHisEne = new TH1D("HisEne", "", fEneMax * 10, 0., fEneMax);
+   fHisEne = new TH1D("HisEne", "", fEneMax * 100, 0., fEneMax);
    fHisEne->SetXTitle(eneLabel);
    fHisEne->SetYTitle("Counts");
    GetOutputList()->Add(fHisEne);
