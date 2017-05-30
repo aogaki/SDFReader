@@ -52,19 +52,19 @@ void MacroParticle::SlaveBegin(TTree * /*tree*/)
 
    // When I use those values.  Setting in SlaveBegin is mandatory.
    // Why?
-   fEneMax = 1000.;
+   fEneMax = 15000.;
    fThetaMax = 180.;
 
    TString eneLabel = "Kinetic energy [MeV]";
    TString thetaLabel = "#it{#theta} [deg]";
    
    fHis2D = new TH2D("His2D", "Kinetic energy VS divergence",
-                     Int_t(fThetaMax * 10), 0., fThetaMax, Int_t(fEneMax * 10), 0., fEneMax);
+                     Int_t(fThetaMax * 10), 0., fThetaMax, Int_t(fEneMax / 10), 0., fEneMax);
    fHis2D->SetXTitle(thetaLabel);
    fHis2D->SetYTitle(eneLabel);
    GetOutputList()->Add(fHis2D);
 
-   fHisEne = new TH1D("HisEne", "", fEneMax * 100, 0., fEneMax);
+   fHisEne = new TH1D("HisEne", "", fEneMax, 0., fEneMax);
    fHisEne->SetXTitle(eneLabel);
    fHisEne->SetYTitle("Counts");
    GetOutputList()->Add(fHisEne);

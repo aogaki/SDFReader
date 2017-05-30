@@ -15,8 +15,8 @@ void ActivatePROOF(TChain *chain, Int_t nThreads = 0)
 
 void ParallelAna()
 {
-   TChain *chain = new TChain("electron1");
-   chain->Add("../electron1.root");
+   TChain *chain = new TChain("proton");
+   chain->Add("../out.root");
    
    //const Int_t kNThreads = chain->GetNtrees();
    //ActivatePROOF(chain, kNThreads);
