@@ -17,6 +17,7 @@
 #include <TString.h>
 #include <TH2.h>
 #include <TVector3.h>
+#include <TGraphPolar.h>
 
 // Headers needed by this particular selector
 
@@ -50,9 +51,13 @@ public :
    TVector3 fP;
    Double_t GetEne() const;
    Double_t GetTheta() const;
+   Double_t GetPhi() const;
+   void GetPolarGraph();
    TH2D *fHis2D;
    TH1D *fHisEne;
    TH1D *fHisTheta;
+   TH1D *fHisTheta360;
+   TGraphPolar *fGrPolar;
    Double_t fEneMax;
    Double_t fThetaMax;
    

@@ -24,7 +24,7 @@
 // root> T->Process("MacroParticle.C+")
 //
 
-
+#include <iostream>
 #include "MacroParticle.h"
 #include <TH2.h>
 #include <TStyle.h>
@@ -40,6 +40,8 @@ void MacroParticle::Begin(TTree * /*tree*/)
    fHis2D = nullptr;
    fHisEne = nullptr;
    fHisTheta = nullptr;
+   fHisTheta360 = nullptr;
+   fGrPolar = nullptr;
 }
 
 void MacroParticle::SlaveBegin(TTree * /*tree*/)
@@ -74,12 +76,19 @@ void MacroParticle::SlaveBegin(TTree * /*tree*/)
    fHisTheta->SetYTitle("Counts");
    GetOutputList()->Add(fHisTheta);
 
+   fHisTheta360 = new TH1D("HisTheta360", "", 3600, 0., 360.);
+   fHisTheta360->SetXTitle(thetaLabel);
+   fHisTheta360->SetYTitle("Counts");
+   GetOutputList()->Add(fHisTheta360);
+
    fHis2D->GetXaxis()->CenterTitle(kTRUE);
    fHis2D->GetYaxis()->CenterTitle(kTRUE);
    fHisEne->GetXaxis()->CenterTitle(kTRUE);
    fHisEne->GetYaxis()->CenterTitle(kTRUE);
    fHisTheta->GetXaxis()->CenterTitle(kTRUE);
    fHisTheta->GetYaxis()->CenterTitle(kTRUE);
+   fHisTheta360->GetXaxis()->CenterTitle(kTRUE);
+   fHisTheta360->GetYaxis()->CenterTitle(kTRUE);
 }
 
 Bool_t MacroParticle::Process(Long64_t entry)
@@ -110,6 +119,8 @@ Bool_t MacroParticle::Process(Long64_t entry)
       fHis2D->Fill(theta, ene, *Weight);
       fHisEne->Fill(ene, *Weight);
       fHisTheta->Fill(theta, *Weight);
+      if(GetPhi() < 0.) theta = 360. - theta;
+      fHisTheta360->Fill(theta, *Weight);
    }
    return kTRUE;
 }
@@ -127,10 +138,13 @@ void MacroParticle::Terminate()
    // The Terminate() function is the last function to be called during
    // a query. It always runs on the client, it can be used to present
    // the results graphically or save the results to file.
+   GetPolarGraph();
    TFile *file = new TFile("tmp.root", "RECREATE");
    fHis2D->Write();
    fHisEne->Write();
    fHisTheta->Write();
+   fHisTheta360->Write();
+   fGrPolar->Write();
    file->Close();
 }
 
@@ -152,3 +166,25 @@ Double_t MacroParticle::GetTheta() const
    return fP.Theta();
 }
 
+Double_t MacroParticle::GetPhi() const
+{
+   return fP.Phi();
+}
+
+void MacroParticle::GetPolarGraph()
+{
+   TGraphErrors *gr = new TGraphErrors(fHisTheta360);
+   const Int_t n = gr->GetN();
+   Double_t *y = gr->GetY();
+   Double_t err[n];
+   Double_t max = fHisTheta360->GetMaximum();
+   for(Int_t i = 0; i < n; i++){
+      y[i] /= max;
+      err[i] = 0.;
+   }
+   fGrPolar = new TGraphPolar(n, gr->GetX(), y, err, err);
+   fGrPolar->SetTitle("");
+   fGrPolar->SetLineColor(kRed);
+   fGrPolar->SetLineWidth(2);
+   //delete gr;
+}
