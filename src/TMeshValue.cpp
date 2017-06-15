@@ -24,7 +24,7 @@ TMeshValue::TMeshValue(TSDFReader *reader)
      fMassDensity(nullptr),
      fChargeDensity(nullptr),
      fNumberDensity(nullptr),
-     fPoyntFlux(nullptr)
+     fPointFlux(nullptr)
 {
    for(Int_t i = 0; i < 3; i++){
       fHisMin[i] = 0;
@@ -56,7 +56,7 @@ TMeshValue::~TMeshValue()
    if(fMassDensity != nullptr) delete fMassDensity;
    if(fChargeDensity != nullptr) delete fChargeDensity;
    if(fNumberDensity != nullptr) delete fNumberDensity;
-   if(fPoyntFlux != nullptr) delete fPoyntFlux;
+   if(fPointFlux != nullptr) delete fPointFlux;
 */
 }
 
@@ -79,7 +79,7 @@ void TMeshValue::Save()
    if(fMassDensity != nullptr) fMassDensity->Write();
    if(fChargeDensity != nullptr) fChargeDensity->Write();
    if(fNumberDensity != nullptr) fNumberDensity->Write();
-   if(fPoyntFlux != nullptr) fPoyntFlux->Write();
+   if(fPointFlux != nullptr) fPointFlux->Write();
 
 }
 

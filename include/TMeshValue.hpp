@@ -50,7 +50,7 @@ private:
    TH1 *fMassDensity;
    TH1 *fChargeDensity;
    TH1 *fNumberDensity;
-   TH1 *fPoyntFlux;
+   TH1 *fPointFlux;
    std::vector<TH1*> Temperature;
 
    // For getting mesh values
