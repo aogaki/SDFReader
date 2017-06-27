@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include <TVector.h>
+#include <TThread.h>
 
 #include "TConverter.hpp"
 #include "TMacroParticle.hpp"
@@ -9,57 +10,52 @@
 using std::cout;
 using std::endl;
 
-TConverter::TConverter(TSDFReader *reader, TString outputName, TString targetName = "")
+TConverter::TConverter(TSDFReader *reader, TString outName, RunMode runMode)
    : fReader(reader),
-     fOutput(nullptr),
-     fMeshValue(nullptr)
+     fRunMode(runMode),
+     fOutName(outName)
 {
-   fMeshValue = new TMeshValue(fReader);
-   fMeshValue->ReadMeshGrid();
-   
-   fOutput = new TFile(outputName, "RECREATE");
-
-   // Save time info
-   TVectorD time(1);
-   time[0] = fReader->GetTime();
-   time.Write("Time");
    
    FindPar();
 
-   fTargetName = targetName;
 }
 
 TConverter::~TConverter()
-{
-   fOutput->Close();
-   
-   delete fMeshValue;
-}
+{}
 
 void TConverter::GetData()
 {
-   if(fTargetName == ""){
-      // Mesh data
-      fMeshValue->GetMeshData();
-      fMeshValue->Save();
+   if(fRunMode == RunMode::AllInfo || fRunMode == RunMode::AllMeshes){
+      TString name = fOutName + "_MeshInfo.root";
+      TFile *file = new TFile(name, "RECREATE");
 
-      // Particle data
-      for(auto name: fParName){
-         cout << name << endl;
-         //TMacroParticle *par = new TMacroParticle(fReader, name);
-         //par->MakeTree();
-         //delete par;
-      }
+      // Save time info
+      TVectorD time(1);
+      time[0] = fReader->GetTime();
+      time.Write("Time");
+   
+      // Mesh data
+      auto mesh = new TMeshValue(fReader);
+      mesh->SetAllOn();
+      mesh->GetMeshData();
+
+      file->Close();
+
+      delete file;
+      delete mesh;
    }
-   else{
-      // Particle data
-      for(auto name: fParName){
-         if(name == fTargetName){
-            cout << name << endl;
-            TMacroParticle *par = new TMacroParticle(fReader, name);
-            par->MakeTree();
-            delete par;
-         }
+   if(fRunMode == RunMode::AllInfo || fRunMode == RunMode::AllParticles){
+      //for(auto name: fParName){
+      for(Int_t i = 0; i < fParName.size(); i++){
+         TString name = fParName[i];
+         TString fileName = fOutName + "_" + name + ".root";
+         TFile *file = new TFile(fileName, "RECREATE");
+         cout << name << endl;
+         auto par = new TMacroParticle(fReader, name);
+         par->MakeTree();
+         file->Close();
+         delete file;
+         delete par;
       }
    }
 }
@@ -72,9 +68,8 @@ void TConverter::FindPar()
       TString id = fReader->fBlock[i]->GetID();
       TString px = id(0, 3);
       if(px == "px/"){
-         id.Remove(0, 3); // 4 means size of "px/"
+         id.Remove(0, 3); // 3 means size of "px/"
          fParName.push_back(id);
       }
    }
 }
-

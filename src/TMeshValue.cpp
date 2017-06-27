@@ -1,5 +1,9 @@
 #include <iostream>
 
+#include <TH1.h>
+#include <TH2.h>
+#include <TH3.h>
+
 #include "TMeshValue.hpp"
 #include "TBlockPlainMesh.hpp"
 #include "TBlockPlainVar.hpp"
@@ -9,84 +13,19 @@ using std::cout;
 using std::endl;
 
 TMeshValue::TMeshValue(TSDFReader *reader)
-   : fReader(reader),
-     fEx(nullptr),
-     fEy(nullptr),
-     fEz(nullptr),   
-     fBx(nullptr),
-     fBy(nullptr),
-     fBz(nullptr),
-     fJx(nullptr),
-     fJy(nullptr),
-     fJz(nullptr),
-     fEkBar(nullptr),
-     fEkFlux(nullptr),
-     fMassDensity(nullptr),
-     fChargeDensity(nullptr),
-     fNumberDensity(nullptr),
-     fPointFlux(nullptr)
+   : fReader(reader)
 {
-   for(Int_t i = 0; i < 3; i++){
-      fHisMin[i] = 0;
-      fHisMax[i] = 0;
-      fHisBinWidth[i] = 0;
-      fHisUnit[i] = "";
-      fHisLabel[i] = "";
-   }
+   //ReadMeshGrid();
+   GetListOfMesh();
 }
 
 TMeshValue::~TMeshValue()
+{}
+
+void TMeshValue::ReadMeshGrid(TString id)
 {
-   // Those are automatically deleted by ROOT?
-/*
-   if(fEx != nullptr) delete fEx;
-   if(fEy != nullptr) delete fEy;
-   if(fEz != nullptr) delete fEz;
-
-   if(fBx != nullptr) delete fBx;
-   if(fBy != nullptr) delete fBy;
-   if(fBz != nullptr) delete fBz;
-
-   if(fJx != nullptr) delete fJx;
-   if(fJy != nullptr) delete fJy;
-   if(fJz != nullptr) delete fJz;
-
-   if(fEkBar != nullptr) delete fEkBar;
-   if(fEkFlux != nullptr) delete fEkFlux;
-   if(fMassDensity != nullptr) delete fMassDensity;
-   if(fChargeDensity != nullptr) delete fChargeDensity;
-   if(fNumberDensity != nullptr) delete fNumberDensity;
-   if(fPointFlux != nullptr) delete fPointFlux;
-*/
-}
-
-void TMeshValue::Save()
-{
-   if(fEx != nullptr) fEx->Write();
-   if(fEy != nullptr) fEy->Write();
-   if(fEz != nullptr) fEz->Write();
-
-   if(fBx != nullptr) fBx->Write();
-   if(fBy != nullptr) fBy->Write();
-   if(fBz != nullptr) fBz->Write();
-
-   if(fJx != nullptr) fJx->Write();
-   if(fJy != nullptr) fJy->Write();
-   if(fJz != nullptr) fJz->Write();
-
-   if(fEkBar != nullptr) fEkBar->Write();
-   if(fEkFlux != nullptr) fEkFlux->Write();
-   if(fMassDensity != nullptr) fMassDensity->Write();
-   if(fChargeDensity != nullptr) fChargeDensity->Write();
-   if(fNumberDensity != nullptr) fNumberDensity->Write();
-   if(fPointFlux != nullptr) fPointFlux->Write();
-
-}
-
-void TMeshValue::ReadMeshGrid()
-{
-   Int_t index = fReader->GetBlockIndex("grid");
-   if(index < 0) return;
+   Int_t index = fReader->GetBlockIndex(id);
+   if(index < 0) index = fReader->GetBlockIndex("grid"); // default
    
    TBlockPlainMesh *block = (TBlockPlainMesh*)fReader->fBlock[index];
 
@@ -107,30 +46,58 @@ void TMeshValue::ReadMeshGrid()
                                             - block->GetData(nGrids[0] + nGrids[1]));
 }
 
+void TMeshValue::GetListOfMesh()
+{
+   for(auto block: fReader->fBlock){
+      if(block->GetBlockType() == 3){
+         MeshPar meshPar;
+         TString id = block->GetID();
+         if(id == "ex") meshPar = MeshPar(id, "Ex", "Electric field x", kFALSE);
+         else if(id == "ey") meshPar = MeshPar(id, "Ey", "Electric field y", kFALSE);
+         else if(id == "ez") meshPar = MeshPar(id, "Ez", "Electric field z", kFALSE);
+         else if(id == "bx") meshPar = MeshPar(id, "Bx", "Magnetic field x", kFALSE);
+         else if(id == "by") meshPar = MeshPar(id, "By", "Magnetic field y", kFALSE);
+         else if(id == "bz") meshPar = MeshPar(id, "Bz", "Magnetic field z", kFALSE);
+         else if(id == "jx") meshPar = MeshPar(id, "Jx", "Current x", kFALSE);
+         else if(id == "jy") meshPar = MeshPar(id, "Jy", "Current y", kFALSE);
+         else if(id == "jz") meshPar = MeshPar(id, "Jz", "Current z", kFALSE);
+         else{
+            TString name = id;
+            name.ReplaceAll("/", "_");
+            TString title = id;
+            title.ReplaceAll("/", " ");
+            meshPar = MeshPar(id, name, title, kFALSE);
+         }
+
+         fMeshList.push_back(meshPar);
+      }
+   }
+}
+
+void TMeshValue::SetAllOn()
+{
+   for(auto &mesh: fMeshList) mesh.Use = kTRUE;
+}
 
 void TMeshValue::GetMeshData()
 {
-   fEx = GetMeshHis("ex", "Ex", "Electric field x");
-   fEy = GetMeshHis("ey", "Ey", "Electric field y");
-   fEz = GetMeshHis("ez", "Ez", "Electric field z");
-   
-   fBx = GetMeshHis("bx", "Bx", "Magnetic field x");
-   fBy = GetMeshHis("by", "By", "Magnetic field y");
-   fBz = GetMeshHis("bz", "Bz", "Magnetic field z");
+   for(auto &mesh: fMeshList){
+      if(mesh.Use == kTRUE){
+         cout << mesh.ID <<"\t"<< mesh.Name <<"\t"<< mesh.Title << endl;
+         GetMeshHis(mesh.ID, mesh.Name, mesh.Title);
+      }
+   }
 
-   fJx = GetMeshHis("jx", "Jx", "Current x");
-   fJy = GetMeshHis("jy", "Jy", "Current y");
-   fJz = GetMeshHis("jz", "Jz", "Current z");
-
-   fNumberDensity = GetMeshHis("number_density/electron", "number_density", "Number density");
 }
 
-TH1 *TMeshValue::GetMeshHis(TString blockName, TString hisName, TString hisTitle)
+void TMeshValue::GetMeshHis(TString id, TString hisName, TString hisTitle)
 {
    TH1 *his{nullptr};
 
-   Int_t index = fReader->GetBlockIndex(blockName);
-   if(index < 0) return nullptr;
+   Int_t index = fReader->GetBlockIndex(id);
+   if(index < 0) return;
+
+   ReadMeshGrid("grid/" + id);
    
    TBlockPlainVar *block = (TBlockPlainVar*)fReader->fBlock[index];
    block->ReadData();
@@ -155,7 +122,7 @@ TH1 *TMeshValue::GetMeshHis(TString blockName, TString hisName, TString hisTitle
    };
 
    // stagger.  Don't use bit mask.  Use number
-   // Check is this right or not.
+   // Check, is this right or not.
    Double_t shift[3] = {0., 0., 0.};
    if(stagger == 1)
       shift[0] += delta[0];
@@ -205,8 +172,8 @@ TH1 *TMeshValue::GetMeshHis(TString blockName, TString hisName, TString hisTitle
          }
       }
    }
-   else if(dim == 3){
-      his = new TH3D(name, title,
+   else if(dim == 3){ // TH3D makes size error of something... I should check whats happen
+      his = new TH3F(name, title,
                      nBins[0], fHisMin[0] - delta[0] + shift[0], fHisMax[0] + delta[0] + shift[0],
                      nBins[1], fHisMin[1] - delta[1] + shift[1], fHisMax[1] + delta[1] + shift[1],
                      nBins[2], fHisMin[2] - delta[2] + shift[2], fHisMax[2] + delta[2] + shift[2]);
@@ -217,7 +184,7 @@ TH1 *TMeshValue::GetMeshHis(TString blockName, TString hisName, TString hisTitle
          for(Int_t y = 1; y <= nBins[1]; y++){
             for(Int_t z = 1; z <= nBins[2]; z++){
                Int_t i = (x - 1) + ((y - 1) * nBins[0]) + ((z - 1) * nBins[0] * nBins[1]);
-               his->SetBinContent(x, y, z, norm * block->GetData(i));
+               his->SetBinContent(x, y, z, Float_t(norm * block->GetData(i)));
             }
          }
       }
@@ -225,7 +192,8 @@ TH1 *TMeshValue::GetMeshHis(TString blockName, TString hisName, TString hisTitle
 
    //block->PrintHeader();
    //block->PrintMetadata();
-   
-   return his;
+
+   his->Write();
+   delete his;
 }
 

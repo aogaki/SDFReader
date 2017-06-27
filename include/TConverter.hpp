@@ -9,20 +9,18 @@
 
 #include <TFile.h>
 #include <TTree.h>
-#include <TH1.h>
-#include <TH2.h>
-#include <TH3.h>
 
 #include "TSDFReader.hpp"
 #include "TBlockPlainMesh.hpp"
 #include "TMeshValue.hpp"
 #include "TMacroParticle.hpp"
+#include "RunMode.hpp"
 
 
 class TConverter
 {
 public:
-   TConverter(TSDFReader *reader, TString outName, TString targetName);
+   TConverter(TSDFReader *reader, TString outName, RunMode runMode);
    ~TConverter();
 
    void GetData();
@@ -30,11 +28,10 @@ public:
 private:
    TSDFReader *fReader;
 
-   TFile *fOutput;
-   
-   // Mesh values
-   TMeshValue *fMeshValue;
+   TString fOutName;
 
+   RunMode fRunMode;
+   
    // Particle values
    std::vector<std::vector<TMacroParticle>> fMacroPar;
    std::vector<TString> fParName;

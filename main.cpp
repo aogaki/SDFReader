@@ -1,29 +1,53 @@
 #include <iostream>
 
+#include <TString.h>
+
 #include "TSDFReader.hpp"
 #include "TConverter.hpp"
+#include "RunMode.hpp"
 
 
 using std::cout;
 using std::endl;
 
+void PrintUsage()
+{
+   cout << "Usage" << endl;
+}
+
 int main(int argc, char **argv)
 {
-  if(argc != 3 && argc != 4){
-    cout << "Useage" <<endl;
-    cout << "sdf2root \"input SDF file name\" \"output ROOT file name\" \"Particle name\"\n"
-	 << endl;
-    exit(0);
-  }
-  
-   //TString fileName = "Data/0006.sdf";
-   TString inputName = "Data/0100.sdf";
-   TString outputName = "out.root";
-   TString targetName = "";
-   
-   if(argc > 1) inputName = argv[1];
-   if(argc > 2) outputName = argv[2];
-   if(argc > 3) targetName = argv[3];
+   TString inputName{""};
+   TString outputName{""};
+   RunMode runMode = RunMode::Interactive;
+
+   // check arguments
+   for(int i = 1; i < argc; i++){
+      cout << argv[i] << endl;
+      TString arg{argv[i]};
+      if(arg == "-h"){
+         PrintUsage();
+         return 0;
+      }
+      else if(arg.Contains(".sdf")){
+         inputName = arg;
+         outputName = arg(arg.Last(TString("/")[0]) + 1, arg.Index(".sdf") - (arg.Last(TString("/")[0]) + 1)); // can you beliebe this shit?
+         cout << inputName << endl;
+         cout << outputName << endl;
+      }
+      else if(arg == "-a") runMode = RunMode::AllInfo;
+      else if(arg == "-p") runMode = RunMode::AllParticles;
+      else if(arg == "-m") runMode = RunMode::AllMeshes;
+      else{
+         PrintUsage();
+         return 0;
+      }
+   }
+
+   if(inputName == ""){
+      PrintUsage();
+      return 0;
+   }
    
    // Reading file information
    TSDFReader *reader = new TSDFReader(inputName);
@@ -38,7 +62,7 @@ int main(int argc, char **argv)
            << endl;
    }
 
-   TConverter *converter = new TConverter(reader, outputName, targetName);
+   TConverter *converter = new TConverter(reader, outputName, runMode);
    converter->GetData();
    delete converter;
 
