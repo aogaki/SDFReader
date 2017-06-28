@@ -49,14 +49,14 @@ void CalAngP(TString number)
    Double_t val = GetAngP(treeProton);
    
    fileProton->Close();
-
+/*
    TFile *fileElectron = new TFile(number + "_electron.root", "READ");
    TTree *treeElectron = (TTree*)fileElectron->Get("electron");
 
    val += GetAngP(treeElectron);
    
    fileElectron->Close();
-
+*/
    cout << number <<"\t"<< val << endl;   
 }
 
@@ -69,5 +69,9 @@ void angP()
    CalAngP("../0011");
    CalAngP("../0012");
    CalAngP("../0015");
+   CalAngP("../0017");
+   CalAngP("../0019");
+   CalAngP("../0021");
+   CalAngP("../0023");
    //CalAngP("0040");
 }

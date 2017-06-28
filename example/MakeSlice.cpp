@@ -4,9 +4,10 @@
 #include <TFile.h>
 #include <TH3.h>
 #include <TH2.h>
+#include <TCanvas.h>
 
 
-void SaveSlices(TH3F *his)
+void SaveSlices(TH3F *his, TString number)
 {// Making slices at Y-Z plane and X-Y plane of 3D histogram
  // X-Z plane? suck my balls
 
@@ -23,6 +24,8 @@ void SaveSlices(TH3F *his)
    const Double_t kMaxCon = his->GetMaximum();
    const Double_t kMinCon = his->GetMinimum();
 
+   number += his->GetName();
+   
    TH2F *hisYZ[kNoBinX];
    for(Int_t i = 0; i < kNoBinX; i++){
       Double_t xPos = his->GetXaxis()->GetBinCenter(i + 1) * 1000000;
@@ -69,36 +72,37 @@ void SaveSlices(TH3F *his)
    gStyle->SetOptStat(kFALSE);
    gStyle->SetPalette(kRainBow);
 
-   TFile *fileYZ = new TFile("sliceYZ.root", "RECREATE");
+   TFile *fileYZ = new TFile(number + "SliceYZ.root", "RECREATE");
    TCanvas *canYZ = new TCanvas("canYZ", "", 900, 900);
-   canYZ->Print("sliceYZ.pdf[", "pdf");
+   canYZ->Print(number + "SliceYZ.pdf[", "pdf");
    for(auto &result: hisYZ){
       result->Write();
       result->Draw("COLZ");
-      canYZ->Print("sliceYZ.pdf", "pdf");
+      canYZ->Print(number + "SliceYZ.pdf", "pdf");
    }
-   canYZ->Print("sliceYZ.pdf]", "pdf");
+   canYZ->Print(number + "SliceYZ.pdf]", "pdf");
    fileYZ->Close();
    delete canYZ;
 
-   TFile *fileXY = new TFile("sliceXY.root", "RECREATE");
+   TFile *fileXY = new TFile(number + "SliceXY.root", "RECREATE");
    TCanvas *canXY = new TCanvas("canXY", "", 900, 900);
-   canXY->Print("sliceXY.pdf[", "pdf");
+   canXY->Print(number + "SliceXY.pdf[", "pdf");
    for(auto &result: hisXY){
       result->Write();
       result->Draw("COLZ");
-      canXY->Print("sliceXY.pdf", "pdf");
+      canXY->Print(number + "SliceXY.pdf", "pdf");
    }
-   canXY->Print("sliceXY.pdf]", "pdf");
+   canXY->Print(number + "SliceXY.pdf]", "pdf");
    fileXY->Close();
    delete canXY;
 }
 
-void MakeSlice()
+void MakeSlice(TString number)
 {
-   TFile *file = new TFile("../0015_MeshInfo.root", "READ");
-   //SaveSlices((TH3F*)file->Get("number_density_electron"));
-   SaveSlices((TH3F*)file->Get("Ey"));
+   TFile *file = new TFile("../" + number + "_MeshInfo.root", "READ");
+   SaveSlices((TH3F*)file->Get("Ey"), number);
+   SaveSlices((TH3F*)file->Get("number_density_electron"), number);
+   SaveSlices((TH3F*)file->Get("number_density_proton"), number);
    
    //file->Close();
 }
