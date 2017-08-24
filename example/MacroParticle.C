@@ -54,7 +54,7 @@ void MacroParticle::SlaveBegin(TTree * /*tree*/)
 
    // When I use those values.  Setting in SlaveBegin is mandatory.
    // Why?
-   fEneMax = 1.;
+   fEneMax = 500.;
    fThetaMax = 180.;
 
    TString eneLabel = "Kinetic energy [MeV]";

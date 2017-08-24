@@ -24,9 +24,9 @@
 
 constexpr Double_t kgElectronMass = 9.10938291e-31;// These values are used in EPOCH. The unit is kg
 constexpr Double_t kgLightSpeed = 2.99792458e8;
-constexpr Double_t kgMassFactor = 1.; // For electron
+//constexpr Double_t kgMassFactor = 1.; // For electron
 //constexpr Double_t kgMassFactor = 1836.2; // For proton
-//constexpr Double_t kgMassFactor = 1836.2*12; // For carbon
+constexpr Double_t kgMassFactor = 1836.2*12; // For carbon
 
 class MacroParticle : public TSelector {
 public :
