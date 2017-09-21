@@ -48,7 +48,9 @@ void TConverter::GetData()
       //for(auto name: fParName){
       for(Int_t i = 0; i < fParName.size(); i++){
          TString name = fParName[i];
-         TString fileName = fOutName + "_" + name + ".root";
+         TString goodName = fParName[i];// Stupid name!!
+         goodName.ReplaceAll("/", "_");
+         TString fileName = fOutName + "_" + goodName + ".root";
          TFile *file = new TFile(fileName, "RECREATE");
          cout << name << endl;
          auto par = new TMacroParticle(fReader, name);
