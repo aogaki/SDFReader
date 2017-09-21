@@ -72,7 +72,9 @@ TBlockPointVar *TMacroParticle::FindBlockPointVar(TString id)
 
 void TMacroParticle::MakeTree()
 {
-  TTree *tree = new TTree(fParName, "particle information");
+   TString treeName = fParName;
+   treeName.ReplaceAll("/", "_");
+  TTree *tree = new TTree(treeName, "particle information");
 
   // Using similar name is not so good.  Block: fPx, Variable: Px.
   // Position
