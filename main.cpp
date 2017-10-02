@@ -12,7 +12,12 @@ using std::endl;
 
 void PrintUsage()
 {
-   cout << "Usage" << endl;
+   cout << "Usage\n"
+        << "sdf2root [option] input file name"
+        << "-a: all information (mesh and macro particle)\n"
+        << "-m: all mesh information\n"
+        << "-p: all macro particle\n"
+        << endl;
 }
 
 int main(int argc, char **argv)
