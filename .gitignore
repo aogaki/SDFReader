@@ -6,6 +6,7 @@ Data
 3D/
 cmake_install.cmake
 SDF2ROOTDict.cpp
+install_manifest.txt
 sdf2root
 Makefile
 *.root
