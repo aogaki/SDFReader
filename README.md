@@ -9,7 +9,7 @@ sudo make install
 
 ## How to use  
 sdf2root "options" "Input SDF file name"
-options:
--a: all information (mesh and macro particle)
--m: all mesh information
--p: all macro particle
+options:  
+-a: all information (mesh and macro particle)  
+-m: all mesh information  
+-p: all macro particle  
