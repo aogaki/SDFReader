@@ -6,6 +6,10 @@ project(sdf2root)
 # I wanna compile with C++11
 add_definitions("-std=c++11 -march=native -mtune=native")
 
+# Making json file for auto complete
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# Searching ROOT. FindROOT.cmake was copied from ROOT source
 include(FindROOT.cmake)
 
 #----------------------------------------------------------------------------

@@ -1,51 +1,52 @@
 #ifndef TMACROPARTICLE
 #define TMACROPARTICLE 1
 /*
-    Macroparticle tree class.  
+    Macroparticle tree class.
 */
 
 #include <TString.h>
 
-#include "TSDFReader.hpp"
 #include "TBlockPointMesh.hpp"
 #include "TBlockPointVar.hpp"
-
+#include "TSDFReader.hpp"
 
 class TMacroParticle
 {
-public:
-   TMacroParticle(TSDFReader *reader, TString parName);
-   ~TMacroParticle();
+ public:
+  TMacroParticle(TSDFReader *reader, TString parName);
+  ~TMacroParticle();
 
-   void MakeTree();
-  
-private:
-   TSDFReader *fReader;
-   TString fParName;
+  void MakeTree();
 
-   // position information
-   void FindMesh();
-   TBlockPointMesh *fGrid;
+ private:
+  TSDFReader *fReader;
+  TString fParName;
 
-   // particle parameters
-   void FindVar();
-   TBlockPointVar *FindBlockPointVar(TString id);
- 
-   TBlockPointVar *fPx;
-   TBlockPointVar *fPy;
-   TBlockPointVar *fPz;
-  
-   TBlockPointVar *fVx;
-   TBlockPointVar *fVy;
-   TBlockPointVar *fVz;
+  // position information
+  void FindMesh();
+  TBlockPointMesh *fGrid;
 
-   TBlockPointVar *fEk; // What is the E? this block shows the kinetic ene.
+  // particle parameters
+  void FindVar();
+  TBlockPointVar *FindBlockPointVar(TString id);
 
-   TBlockPointVar *fWeight;
+  TBlockPointVar *fPx;
+  TBlockPointVar *fPy;
+  TBlockPointVar *fPz;
 
-   TBlockPointVar *fOptDep;
+  TBlockPointVar *fVx;
+  TBlockPointVar *fVy;
+  TBlockPointVar *fVz;
 
-   TBlockPointVar *fQEDEne;
+  TBlockPointVar *fEk;  // What is the E? this block shows the kinetic ene.
+
+  TBlockPointVar *fWeight;
+
+  TBlockPointVar *fOptDep;
+
+  TBlockPointVar *fQEDEne;
+
+  TBlockPointVar *fID;
 };
 
 #endif

@@ -1,43 +1,42 @@
 #include <TTree.h>
 
-#include "TMacroParticle.hpp"
 #include "TBlockPointMesh.hpp"
 #include "TBlockPointVar.hpp"
-
+#include "TMacroParticle.hpp"
 
 using std::cout;
 using std::endl;
 
 TMacroParticle::TMacroParticle(TSDFReader *reader, TString parName)
-  : fReader(reader),
-    fParName(parName),
-    fGrid(nullptr),
-    fPx(nullptr),
-    fPy(nullptr),
-    fPz(nullptr),
-    fVx(nullptr),
-    fVy(nullptr),
-    fVz(nullptr),
-    fEk(nullptr),
-    fWeight(nullptr),
-    fOptDep(nullptr),
-    fQEDEne(nullptr)
+    : fReader(reader),
+      fParName(parName),
+      fGrid(nullptr),
+      fPx(nullptr),
+      fPy(nullptr),
+      fPz(nullptr),
+      fVx(nullptr),
+      fVy(nullptr),
+      fVz(nullptr),
+      fEk(nullptr),
+      fWeight(nullptr),
+      fOptDep(nullptr),
+      fQEDEne(nullptr),
+      fID(nullptr)
 {
   FindMesh();
   FindVar();
 }
 
-TMacroParticle::~TMacroParticle()
-{}
+TMacroParticle::~TMacroParticle() {}
 
 void TMacroParticle::FindMesh()
 {
   TString meshID = "grid/" + fParName;
   Int_t index = fReader->GetBlockIndex(meshID);
-  if(index < 0) return;
-  fGrid = (TBlockPointMesh*)fReader->fBlock[index];
+  if (index < 0) return;
+  fGrid = (TBlockPointMesh *)fReader->fBlock[index];
   fGrid->ReadMetadata();
-  fGrid->ReadData(); // This shoud be changed.
+  fGrid->ReadData();  // This shoud be changed.
 }
 
 void TMacroParticle::FindVar()
@@ -57,23 +56,25 @@ void TMacroParticle::FindVar()
   fOptDep = FindBlockPointVar("optical depth/" + fParName);
 
   fQEDEne = FindBlockPointVar("qed energy/" + fParName);
+
+  fID = FindBlockPointVar("id/" + fParName);
 }
 
 TBlockPointVar *TMacroParticle::FindBlockPointVar(TString id)
 {
   Int_t index = fReader->GetBlockIndex(id);
-  if(index < 0) return nullptr;
-  TBlockPointVar *block = (TBlockPointVar*)fReader->fBlock[index];
+  if (index < 0) return nullptr;
+  TBlockPointVar *block = (TBlockPointVar *)fReader->fBlock[index];
   block->ReadMetadata();
-  block->ReadData(); // This shoud be changed.
+  block->ReadData();  // This shoud be changed.
 
   return block;
 }
 
 void TMacroParticle::MakeTree()
 {
-   TString treeName = fParName;
-   treeName.ReplaceAll("/", "_");
+  TString treeName = fParName;
+  treeName.ReplaceAll("/", "_");
   TTree *tree = new TTree(treeName, "particle information");
 
   // Using similar name is not so good.  Block: fPx, Variable: Px.
@@ -84,7 +85,7 @@ void TMacroParticle::MakeTree()
   tree->Branch("y", &y, "y/D");
   Double_t z;
   tree->Branch("z", &z, "z/D");
-  
+
   // Momentum
   Double_t Px;
   tree->Branch("Px", &Px, "Px/D");
@@ -92,7 +93,7 @@ void TMacroParticle::MakeTree()
   tree->Branch("Py", &Py, "Py/D");
   Double_t Pz;
   tree->Branch("Pz", &Pz, "Pz/D");
-  
+
   // Velocity
   Double_t Vx;
   tree->Branch("Vx", &Vx, "Vx/D");
@@ -117,35 +118,42 @@ void TMacroParticle::MakeTree()
   Double_t QEDEne;
   tree->Branch("QEDEne", &QEDEne, "QEDEne/D");
 
+  // Particle ID
+  // Don't use PARTICLE_ID4.
+  Long64_t id;
+  tree->Branch("ID", &id, "ID/L");
 
   const Long64_t kNoPar = fPx->GetDataSize();
   cout << kNoPar << endl;
-  for(Long64_t i = 0; i < kNoPar; i++){
-     if(i % 1000000 == 0)
-        cout << i <<" / "<< kNoPar <<" ("<< i * 100. / kNoPar <<" %)"<< endl;
-     
-     if(fPx) Px = fPx->GetData(i);
-     if(fPy) Py = fPy->GetData(i);
-     if(fPz) Pz = fPz->GetData(i);
-    
-     if(fVx) Vx = fVx->GetData(i);
-     if(fVy) Vy = fVy->GetData(i);
-     if(fVz) Vz = fVz->GetData(i);
-    
-     if(fEk) Ek = fEk->GetData(i);
+  for (Long64_t i = 0; i < kNoPar; i++) {
+    if (i % 1000000 == 0)
+      cout << i << " / " << kNoPar << " (" << i * 100. / kNoPar << " %)"
+           << endl;
 
-     if(fWeight) Weight = fWeight->GetData(i);
+    if (fPx) Px = fPx->GetData(i);
+    if (fPy) Py = fPy->GetData(i);
+    if (fPz) Pz = fPz->GetData(i);
 
-     if(fOptDep) optDep = fOptDep->GetData(i);
-     
-     if(fQEDEne) QEDEne = fQEDEne->GetData(i);
+    if (fVx) Vx = fVx->GetData(i);
+    if (fVy) Vy = fVy->GetData(i);
+    if (fVz) Vz = fVz->GetData(i);
 
-     if(fGrid){
-        x = fGrid->GetData(i);
-        if(fGrid->GetNDims() > 1) y = fGrid->GetData(i + kNoPar);
-        if(fGrid->GetNDims() > 2) z = fGrid->GetData(i + kNoPar + kNoPar);
-     }
-     tree->Fill();
+    if (fEk) Ek = fEk->GetData(i);
+
+    if (fWeight) Weight = fWeight->GetData(i);
+
+    if (fOptDep) optDep = fOptDep->GetData(i);
+
+    if (fQEDEne) QEDEne = fQEDEne->GetData(i);
+
+    if (fID) id = fID->GetID(i);
+
+    if (fGrid) {
+      x = fGrid->GetData(i);
+      if (fGrid->GetNDims() > 1) y = fGrid->GetData(i + kNoPar);
+      if (fGrid->GetNDims() > 2) z = fGrid->GetData(i + kNoPar + kNoPar);
+    }
+    tree->Fill();
   }
 
   tree->Write();
