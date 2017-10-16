@@ -5,6 +5,7 @@
 */
 
 #include <TString.h>
+#include <TTree.h>
 
 #include "TBlockPointMesh.hpp"
 #include "TBlockPointVar.hpp"
@@ -17,6 +18,7 @@ class TMacroParticle
   ~TMacroParticle();
 
   void MakeTree();
+  void AddTree(TTree *tree);
 
  private:
   TSDFReader *fReader;

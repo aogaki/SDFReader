@@ -33,8 +33,8 @@ TBlockPointVar::TBlockPointVar(std::ifstream *file, Long_t location,
   else if (fDataType == 3)
     fDataSize = fDataLength / sizeof(Float_t);
   else {
-    cout << "DataType error in GetHeader@BlockPointVar" << endl;
-    cout << "Now, only double and float data types are implemented" << endl;
+    // cout << "DataType error in GetHeader@BlockPointVar" << endl;
+    // cout << "Now, only double and float data types are implemented" << endl;
     // exit(0);
   }
 }
