@@ -45,7 +45,7 @@ void TSDFReader::ReadFileHeader()
 
   Int_t endianness;
   fInputFile->read((Char_t *)(&endianness), sizeof(endianness));
-  //  cout << "endianness = " << endianness << endl;
+  cout << "endianness = " << endianness << endl;
   if (endianness != 16911887) {
     std::cerr
         << "This file have not same endian.  Converter is not implemented now."
@@ -55,7 +55,7 @@ void TSDFReader::ReadFileHeader()
 
   Int_t sdf_version;
   fInputFile->read((Char_t *)(&sdf_version), sizeof(sdf_version));
-  //  cout << "sdf_version = " << sdf_version << endl;
+  cout << "sdf_version = " << sdf_version << endl;
   if (sdf_version > kSDFVersion) {
     std::cerr << "The version of file has to be newer than this reader. The "
                  "reader version = "
@@ -65,7 +65,7 @@ void TSDFReader::ReadFileHeader()
 
   Int_t sdf_revision;
   fInputFile->read((Char_t *)(&sdf_revision), sizeof(sdf_revision));
-  //  cout << "sdf_revision = " << sdf_revision << endl;
+  cout << "sdf_revision = " << sdf_revision << endl;
   if (sdf_version == kSDFVersion && sdf_revision > kSDFRevision) {
     std::cerr << "The revision of file is newer than this reader. The reader "
                  "revision = "
@@ -74,22 +74,22 @@ void TSDFReader::ReadFileHeader()
 
   Char_t code_name[32];
   fInputFile->read(code_name, sizeof(Char_t) * 32);
-  //  cout << "code_name = " << code_name << endl;
+  cout << "code_name = " << code_name << endl;
 
   fInputFile->read((Char_t *)(&fNextBlockLocation), sizeof(fNextBlockLocation));
-  //  cout << "first_block_location = " << fNextBlockLocation << endl;
+  cout << "first_block_location = " << fNextBlockLocation << endl;
 
   Long_t summary_location;
   fInputFile->read((Char_t *)(&summary_location), sizeof(summary_location));
-  //  cout << "summary_location = " << summary_location << endl;
+  cout << "summary_location = " << summary_location << endl;
 
   Int_t summary_size;
   fInputFile->read((Char_t *)(&summary_size), sizeof(summary_size));
-  //  cout << "summary_size = " << summary_size << endl;
+  cout << "summary_size = " << summary_size << endl;
 
   Int_t nblocks;
   fInputFile->read((Char_t *)(&nblocks), sizeof(nblocks));
-  //  cout << "nblocks = " << nblocks << endl;
+  cout << "nblocks = " << nblocks << endl;
   if (nblocks == 0) {
     std::cerr << "This file is not finished." << endl;
     exit(0);
@@ -97,34 +97,34 @@ void TSDFReader::ReadFileHeader()
   fNBlocks = nblocks;
 
   fInputFile->read((Char_t *)(&fBlockHeaderLength), sizeof(fBlockHeaderLength));
-  //  cout << "block_header_length = " << fBlockHeaderLength << endl;
+  cout << "block_header_length = " << fBlockHeaderLength << endl;
 
   fInputFile->read((Char_t *)(&fStep), sizeof(fStep));
-  //  cout << "step = " << fStep << endl;
+  cout << "step = " << fStep << endl;
 
   fInputFile->read((Char_t *)(&fTime), sizeof(fTime));
-  //  cout << "time = " << fTime << endl;
+  cout << "time = " << fTime << endl;
 
   fInputFile->read((Char_t *)(&fJobID1), sizeof(fJobID1));
-  //  cout << "jobid1 = " << fJobID1 << endl;
+  cout << "jobid1 = " << fJobID1 << endl;
 
   fInputFile->read((Char_t *)(&fJobID2), sizeof(fJobID2));
-  //  cout << "jobid2 = " << fJobID2 << endl;
+  cout << "jobid2 = " << fJobID2 << endl;
 
   fInputFile->read((Char_t *)(&fStringLength), sizeof(fStringLength));
-  //  cout << "string_length = " << fStringLength << endl;
+  cout << "string_length = " << fStringLength << endl;
 
   Int_t code_io_version;
   fInputFile->read((Char_t *)(&code_io_version), sizeof(code_io_version));
-  //  cout << "code_io_version = " << code_io_version << endl;
+  cout << "code_io_version = " << code_io_version << endl;
 
   Char_t restart_flag;
   fInputFile->read(&restart_flag, sizeof(restart_flag));
-  //  cout << "restart_flag = " << Int_t(restart_flag) << endl;
+  cout << "restart_flag = " << Int_t(restart_flag) << endl;
 
   Char_t subdomain_file;
   fInputFile->read(&subdomain_file, sizeof(subdomain_file));
-  //  cout << "subdomain_file = " << Int_t(subdomain_file) << endl;
+  cout << "subdomain_file = " << Int_t(subdomain_file) << endl;
 }
 
 void TSDFReader::LoadBlocks()
