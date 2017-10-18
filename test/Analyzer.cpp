@@ -13,6 +13,10 @@
 #include <TGraph2D.h>
 #include <TStyle.h>
 
+// If you use ROOT5 use following defines
+//#define constexpr const
+//#define nullptr NULL
+
 
 constexpr Double_t kgElectronMass = 9.10938291e-31;// These values are used in EPOCH.
 constexpr Double_t kgLightSpeed = 2.99792458e8;
@@ -27,6 +31,8 @@ public:
    TAnalyzer(TFile *file);
    ~TAnalyzer();
 
+   void Initialize();
+   
    // When time or position range are over, all functions return 0
    // Think better value!
    Double_t GetEneMaxIon(Double_t t); // return max energy at time t
@@ -51,7 +57,7 @@ public:
    TGraph2D *fGrEx;
 
    TGraph *fGrPx;
-   
+
 private:
    TFile *fInputFile;
 
@@ -75,10 +81,41 @@ private:
    std::vector<Double_t> fHighEneElectron;
 
    Bool_t CheckTime(Double_t t);
+   Bool_t CheckPosition(Double_t x, TGraph2D *gr);
 };
 
 TAnalyzer::TAnalyzer(TFile *file)
-   :fInputFile(file)
+   : fGrEneMaxIon(nullptr),
+     fGrHighEneIon(nullptr),
+     fGrEneMaxElectron(nullptr),
+     fGrHighEneElectron(nullptr),
+     fGrDiffDensity(nullptr),
+     fGrEx(nullptr),
+     fGrPx(nullptr),
+     fInputFile(file)
+{
+   fHisIon.clear();
+}
+
+TAnalyzer::~TAnalyzer()
+{
+   for(UInt_t i = 0; i < fHisIon.size(); i++) delete fHisIon[i];
+   for(UInt_t i = 0; i < fHisElectron.size(); i++) delete fHisElectron[i];
+   
+   delete fGrEneMaxIon;
+   delete fGrHighEneIon;
+   delete fGrEneMaxElectron;
+   delete fGrHighEneElectron;
+
+   delete fGrDiffDensity;
+   delete fGrEx;
+
+   delete fGrPx;
+
+   fInputFile->Close();
+}
+
+void TAnalyzer::Initialize()
 {
    GetDirList();
    GetTimeInfo();
@@ -87,14 +124,9 @@ TAnalyzer::TAnalyzer(TFile *file)
    MakeGraph();
 }
 
-TAnalyzer::~TAnalyzer()
-{
-
-}
-
 void TAnalyzer::GetDirList()
 {
-   auto list = fInputFile->GetListOfKeys();
+   TList *list = fInputFile->GetListOfKeys();
    TIter next(list);
    TDirectory *dir;
    while((dir = (TDirectory*)next())){
@@ -104,11 +136,11 @@ void TAnalyzer::GetDirList()
 
 void TAnalyzer::GetTimeInfo()
 {
-   for(auto &dirName: fDirList){
-      auto time = (TVectorD*)fInputFile->Get(dirName + "/Time");
+   for(UInt_t i = 0; i < fDirList.size(); i++){
+      TVectorD *time = (TVectorD*)fInputFile->Get(fDirList[i] + "/Time");
       fTime.push_back((*time)[0] * 1.e15);
+      cout << (*time)[0] * 1.e15 << endl;
    }
-   for(auto time: fTime) cout << time << endl;
 }
 
 void TAnalyzer::FillHisEne()
@@ -117,18 +149,18 @@ void TAnalyzer::FillHisEne()
    constexpr Double_t ionMass = kgElectronMass * kgIonFactor;
 
    UInt_t counter = 0;
-   for(auto &dirName: fDirList){
-      auto hisEle = new TH1D("HisEle" + dirName,
+   for(UInt_t i = 0; i < fDirList.size(); i++){
+      TH1D *hisEle = new TH1D("HisEle" + fDirList[i],
                              Form("Energy distribution at %f fs", fTime[counter]),
                              1000, 0., 10.);
       hisEle->SetXTitle("Kinetic Energy [MeV]");
       
-      auto hisIon = new TH1D("HisIon" + dirName,
+      TH1D *hisIon = new TH1D("HisIon" + fDirList[i],
                              Form("Energy distribution at %f fs", fTime[counter++]),
                              1000, 0., 10.);
       hisIon->SetXTitle("Kinetic Energy [MeV]");
       
-      auto tree = (TTree*)fInputFile->Get(dirName + "/particles");
+      TTree *tree = (TTree*)fInputFile->Get(fDirList[i] + "/particles");
       tree->SetBranchStatus("*", kFALSE);
 
       TString *type{nullptr};
@@ -147,8 +179,8 @@ void TAnalyzer::FillHisEne()
       tree->SetBranchStatus("Weight", kTRUE);
       tree->SetBranchAddress("Weight", &weight);      
 
-      const auto kNoPar = tree->GetEntries();
-      for(auto i = 0; i < kNoPar; i++){
+      const Long64_t kNoPar = tree->GetEntries();
+      for(Long64_t i = 0; i < kNoPar; i++){
          tree->GetEntry(i);
          if(*type == "electron"){
             hisEle->Fill(GetKineEne(P, eleMass), weight);
@@ -168,11 +200,11 @@ void TAnalyzer::FillHisEne()
 
 Double_t TAnalyzer::GetKineEne(const TVector3 &P, const Double_t &mass)
 {
-   auto magP = P.Mag2(); // magnitude * magnitude
+   Double_t magP = P.Mag2(); // magnitude * magnitude
    if(magP == 0.) return 0.;
 
    constexpr Double_t c2 = kgLightSpeed*kgLightSpeed;
-   auto K = sqrt(mass*mass * c2*c2 + magP * c2) - mass * c2; // in J
+   Double_t K = sqrt(mass*mass * c2*c2 + magP * c2) - mass * c2; // in J
 
    constexpr Double_t MeV = 6.241509e12;
    return K*MeV;
@@ -181,29 +213,29 @@ Double_t TAnalyzer::GetKineEne(const TVector3 &P, const Double_t &mass)
 void TAnalyzer::GetGraphInfo()
 {
    // Ion
-   for(auto &his: fHisIon){
-      auto nBins = his->GetNbinsX();
-      auto maxBin = nBins;
+   for(UInt_t i = 0; i < fHisIon.size(); i++){
+      Int_t nBins = fHisIon[i]->GetNbinsX();
+      Int_t maxBin = nBins;
       
-      for(; maxBin > 0; maxBin--) if(his->GetBinContent(maxBin) > 0.) break;
-      auto eneMax = his->GetBinCenter(maxBin);
+      for(; maxBin > 0; maxBin--) if(fHisIon[i]->GetBinContent(maxBin) > 0.) break;
+      Double_t eneMax = fHisIon[i]->GetBinCenter(maxBin);
       fEMaxIon.push_back(eneMax);
 
-      auto thBin = his->FindBin(eneMax / 10.);
-      auto nHighEnePar = his->Integral(thBin, nBins);
+      Int_t thBin = fHisIon[i]->FindBin(eneMax / 10.);
+      Double_t nHighEnePar = fHisIon[i]->Integral(thBin, nBins);
       fHighEneIon.push_back(nHighEnePar);
    }
    // Electron
-   for(auto &his: fHisElectron){
-      auto nBins = his->GetNbinsX();
-      auto maxBin = nBins;
+   for(UInt_t i = 0; i < fHisElectron.size(); i++){
+      Int_t nBins = fHisElectron[i]->GetNbinsX();
+      Int_t maxBin = nBins;
       
-      for(; maxBin > 0; maxBin--) if(his->GetBinContent(maxBin) > 0.) break;
-      auto eneMax = his->GetBinCenter(maxBin);
+      for(; maxBin > 0; maxBin--) if(fHisElectron[i]->GetBinContent(maxBin) > 0.) break;
+      Double_t eneMax = fHisElectron[i]->GetBinCenter(maxBin);
       fEMaxElectron.push_back(eneMax);
 
-      auto thBin = his->FindBin(eneMax / 10.);
-      auto nHighEnePar = his->Integral(thBin, nBins);
+      Int_t thBin = fHisElectron[i]->FindBin(eneMax / 10.);
+      Double_t nHighEnePar = fHisElectron[i]->Integral(thBin, nBins);
       fHighEneElectron.push_back(nHighEnePar);
    }
 }
@@ -218,26 +250,25 @@ void TAnalyzer::MakeGraph()
    fGrHighEneElectron = new TGraph(nData, &fTime[0], &fHighEneElectron[0]);
 
    // 2D Graphs
-   // Too long!!
    fGrDiffDensity = new TGraph2D();
    fGrDiffDensity->SetTitle("Electron density - Ion density;position [m];time [fs];Difference [m^{-3}]");
    
    fGrEx = new TGraph2D();
-   fGrEx->SetTitle("Electric field x;position [m];time [fs];Difference [m^{-3}]");
+   fGrEx->SetTitle("Electric field x;position [m];time [fs];Ex [V/m]");
    
-   for(auto iStep = 0, counter = 0; iStep < fTime.size(); iStep++){ // SDF is better name?
-      auto time = fTime[iStep];
+   for(UInt_t iStep = 0, counter = 0; iStep < fTime.size(); iStep++){ // SDF is better name?
+      Double_t time = fTime[iStep];
       
-      auto dirName = fDirList[iStep];
-      auto hisIon = (TH1D*)fInputFile->Get(dirName + "/number_density_Ion");
-      auto hisEle = (TH1D*)fInputFile->Get(dirName + "/number_density_Electron");
-      auto hisEx = (TH1D*)fInputFile->Get(dirName + "/Ex");
+      TString dirName = fDirList[iStep];
+      TH1D *hisIon = (TH1D*)fInputFile->Get(dirName + "/number_density_Ion");
+      TH1D *hisEle = (TH1D*)fInputFile->Get(dirName + "/number_density_Electron");
+      TH1D *hisEx = (TH1D*)fInputFile->Get(dirName + "/Ex");
 
-      const auto nBins = hisIon->GetNbinsX();
-      for(auto iBin = 0; iBin < nBins; iBin++ ){
-         auto diff = hisEle->GetBinContent(iBin) - hisIon->GetBinContent(iBin);
-         auto position = hisEle->GetBinCenter(iBin);
-         auto ex = hisEx->GetBinContent(iBin);
+      const Int_t nBins = hisIon->GetNbinsX();
+      for(Int_t iBin = 0; iBin < nBins; iBin++ ){
+         Double_t diff = hisEle->GetBinContent(iBin) - hisIon->GetBinContent(iBin);
+         Double_t position = hisEle->GetBinCenter(iBin);
+         Double_t ex = hisEx->GetBinContent(iBin);
          fGrDiffDensity->SetPoint(counter, position, time, diff);
          fGrEx->SetPoint(counter, position, time, ex);
          counter++;
@@ -270,14 +301,18 @@ Double_t TAnalyzer::GetHighEnergyElectron(Double_t t)
 }
 
 Double_t TAnalyzer::GetDiffDensity(Double_t x, Double_t t)
-{// Position range check NYI
-   if(CheckTime(t)) return fGrDiffDensity->Eval(x, t);
+{
+   if(CheckTime(t) && CheckPosition(x, fGrDiffDensity))
+      return fGrDiffDensity->Interpolate(x, t);
+   
    return 0.;
 }
 
 Double_t TAnalyzer::GetEx(Double_t x, Double_t t)
 {
-   if(CheckTime(t)) return fGrEx->Eval(x, t);
+   if(CheckTime(t) && CheckPosition(x, fGrEx))
+      return fGrEx->Interpolate(x, t);
+
    return 0.;
 }
 
@@ -291,15 +326,29 @@ Bool_t TAnalyzer::CheckTime(Double_t t)
    return kTRUE;
 }
 
+Bool_t TAnalyzer::CheckPosition(Double_t x, TGraph2D *gr)
+{
+   const Int_t nData = gr->GetN();
+   const Double_t *position = gr->GetX(); // Is this sorted?
+
+   if(x > position[nData - 1] || x < position[0]){
+      cout << "Position range is from " << position[0] <<" to "<< position[nData - 1] << endl;
+      return kFALSE;
+   }
+   return kTRUE;
+}
 
 
-TAnalyzer *test;
+TAnalyzer *test = nullptr;
 
 void Analyzer()
 {
-   auto file = TFile::Open("result.root");
+   TFile *file = TFile::Open("result.root");
 
+   if(test) delete test;
    test = new TAnalyzer(file);
+   test->Initialize();
+   
    gStyle->SetPalette(kRainBow);
    gStyle->SetNumberContours(99);
    test->fGrEx->Draw("SURF1Z");

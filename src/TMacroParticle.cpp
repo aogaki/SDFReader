@@ -183,29 +183,29 @@ void TMacroParticle::AddTree(TTree *tree)
   Double_t Pz;
   tree->Branch("Pz", &Pz, "Pz/D");
 
-  // Velocity
-  Double_t Vx;
-  tree->Branch("Vx", &Vx, "Vx/D");
-  Double_t Vy;
-  tree->Branch("Vy", &Vy, "Vy/D");
-  Double_t Vz;
-  tree->Branch("Vz", &Vz, "Vz/D");
-
-  // Kinetic energy
-  Double_t Ek;
-  tree->Branch("Ek", &Ek, "Ek/D");
+  // // Velocity
+  // Double_t Vx;
+  // tree->Branch("Vx", &Vx, "Vx/D");
+  // Double_t Vy;
+  // tree->Branch("Vy", &Vy, "Vy/D");
+  // Double_t Vz;
+  // tree->Branch("Vz", &Vz, "Vz/D");
+  //
+  // // Kinetic energy
+  // Double_t Ek;
+  // tree->Branch("Ek", &Ek, "Ek/D");
 
   // Weight
   Double_t Weight;
   tree->Branch("Weight", &Weight, "Weight/D");
 
-  // Optical depth
-  Double_t optDep;
-  tree->Branch("OptDep", &optDep, "OptDep/D");
-
-  // QED energy
-  Double_t QEDEne;
-  tree->Branch("QEDEne", &QEDEne, "QEDEne/D");
+  // // Optical depth
+  // Double_t optDep;
+  // tree->Branch("OptDep", &optDep, "OptDep/D");
+  //
+  // // QED energy
+  // Double_t QEDEne;
+  // tree->Branch("QEDEne", &QEDEne, "QEDEne/D");
 
   // Particle ID
   // Don't use PARTICLE_ID4.
@@ -223,17 +223,17 @@ void TMacroParticle::AddTree(TTree *tree)
     if (fPy) Py = fPy->GetData(i);
     if (fPz) Pz = fPz->GetData(i);
 
-    if (fVx) Vx = fVx->GetData(i);
-    if (fVy) Vy = fVy->GetData(i);
-    if (fVz) Vz = fVz->GetData(i);
-
-    if (fEk) Ek = fEk->GetData(i);
+    // if (fVx) Vx = fVx->GetData(i);
+    // if (fVy) Vy = fVy->GetData(i);
+    // if (fVz) Vz = fVz->GetData(i);
+    //
+    // if (fEk) Ek = fEk->GetData(i);
 
     if (fWeight) Weight = fWeight->GetData(i);
 
-    if (fOptDep) optDep = fOptDep->GetData(i);
-
-    if (fQEDEne) QEDEne = fQEDEne->GetData(i);
+    // if (fOptDep) optDep = fOptDep->GetData(i);
+    //
+    // if (fQEDEne) QEDEne = fQEDEne->GetData(i);
 
     if (fID) id = fID->GetID(i);
 
