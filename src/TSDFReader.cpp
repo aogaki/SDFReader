@@ -182,9 +182,12 @@ Int_t TSDFReader::GetNextBlockType()
 
 Int_t TSDFReader::GetBlockIndex(TString ID)
 {
-   for(Int_t i = 0; i < GetNBlocks(); i++)
-      if(ID == fBlock[i]->GetID()) return i;
+   ID.ToLower();
+   for (Int_t i = 0; i < GetNBlocks(); i++) {
+      TString blockID = fBlock[i]->GetID();
+      blockID.ToLower();
+      if (ID == blockID) return i;
+   }
 
    return -1;
 }
-
