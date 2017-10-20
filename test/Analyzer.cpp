@@ -47,6 +47,8 @@ public:
    // For easy debug, member variables of histograms and graphs are public
    std::vector<TH1D*> fHisIon;
    std::vector<TH1D*> fHisElectron;
+   std::vector<TH1D*> fHisIonPx;
+   std::vector<TH1D*> fHisElectronPx;
 
    TGraph *fGrEneMaxIon;
    TGraph *fGrHighEneIon;
@@ -95,12 +97,17 @@ TAnalyzer::TAnalyzer(TFile *file)
      fInputFile(file)
 {
    fHisIon.clear();
+   fHisElectron.clear();
+   fHisIonPx.clear();
+   fHisElectronPx.clear();
 }
 
 TAnalyzer::~TAnalyzer()
 {
    for(UInt_t i = 0; i < fHisIon.size(); i++) delete fHisIon[i];
    for(UInt_t i = 0; i < fHisElectron.size(); i++) delete fHisElectron[i];
+   for(UInt_t i = 0; i < fHisIonPx.size(); i++) delete fHisIonPx[i];
+   for(UInt_t i = 0; i < fHisElectronPx.size(); i++) delete fHisElectronPx[i];
    
    delete fGrEneMaxIon;
    delete fGrHighEneIon;
@@ -160,13 +167,34 @@ void TAnalyzer::FillHisEne()
                              1000, 0., 10.);
       hisIon->SetXTitle("Kinetic Energy [MeV]");
       
+      TH1D *hisElePx = new TH1D("HisElePx" + fDirList[i],
+                             Form("Px distribution at %f fs", fTime[counter]),
+                             100, 0., 0.);
+      //hisElePx->SetXTitle("Kinetic Energy [MeV]");
+      
+      TH1D *hisIonPx = new TH1D("HisIonPx" + fDirList[i],
+                                Form("Px distribution at %f fs", fTime[counter++]),
+                                100, 0., 0.);
+      //hisIonPx->SetXTitle("Kinetic Energy [MeV]");
+      
+      TH1D *ex = (TH1D*)fInputFile->Get(fDirList[i] + "/Ex");
+      Int_t maxBin = ex->GetMaximumBin();
+      Int_t minBin = ex->GetMinimumBin();
+      Double_t lowEdge = ex->GetBinLowEdge(maxBin);
+      Double_t binWidth = ex->GetBinWidth(maxBin);
+      Double_t upEdge = lowEdge + binWidth;
+      
       TTree *tree = (TTree*)fInputFile->Get(fDirList[i] + "/particles");
       tree->SetBranchStatus("*", kFALSE);
 
-      TString *type{nullptr};
+      TString *type = nullptr;
       tree->SetBranchStatus("Ptype", kTRUE);
       tree->SetBranchAddress("Ptype", &type);
 
+      Double_t x;
+      tree->SetBranchStatus("x", kTRUE);
+      tree->SetBranchAddress("x", &x);
+   
       TVector3 P;
       tree->SetBranchStatus("Px", kTRUE);
       tree->SetBranchStatus("Py", kTRUE);
@@ -184,9 +212,15 @@ void TAnalyzer::FillHisEne()
          tree->GetEntry(i);
          if(*type == "electron"){
             hisEle->Fill(GetKineEne(P, eleMass), weight);
+            if(x >= lowEdge && x < upEdge)
+               //hisElePx->Fill(GetKineEne(TVector3(P[0], 0., 0.), eleMass), weight);
+               hisElePx->Fill(P[0], weight);
          }
          else if(*type == "ion"){
             hisIon->Fill(GetKineEne(P, ionMass), weight);
+            if(x >= lowEdge && x < upEdge)
+               //hisIonPx->Fill(GetKineEne(TVector3(P[0], 0., 0.), ionMass), weight);
+               hisIonPx->Fill(P[0], weight);
          }
          else{
             cout << "What is this particle type?: " << *type << endl;
@@ -195,6 +229,8 @@ void TAnalyzer::FillHisEne()
       
       fHisElectron.push_back(hisEle);
       fHisIon.push_back(hisIon);
+      fHisElectronPx.push_back(hisElePx);
+      fHisIonPx.push_back(hisIonPx);
    }
 }
 
