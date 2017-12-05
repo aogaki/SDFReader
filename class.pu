@@ -1,0 +1,72 @@
+@startuml
+package "SDF file reader"{
+class TBlock{
+  +GetBlockInfo()
+  +GetData()
+
+  #ReadBlockInfo()
+  -ReadAndDecodeData()
+
+  -BlockInfo
+
+}
+
+class TBlockPlainMesh{
+  -GridPositionInfo
+  -ReadGridPosition()
+}
+
+class TBlockPlainVar{
+  -GridValueInfo
+  -ReadGridValiable()
+}
+
+class TBlockPointMesh{
+  -ParticlePositionInfo
+  -ReadParticlePosition()
+}
+
+class TBlockPointVar{
+  -ParticleValueInfo
+  -ReadParticleValiable()
+}
+
+class TSDFReader{
+  -vector<TBlock>
+  +GetBlockData()
+}
+
+}
+
+TBlock <|-- TBlockPlainMesh
+TBlock <|-- TBlockPlainVar
+TBlock <|-- TBlockPointMesh
+TBlock <|-- TBlockPointVar
+
+TSDFReader *-- TBlock
+
+class TConverter{
+  +SetFileName()
+  +ForwardingValues()
+}
+
+package "ROOT file writer"{
+  class TMacroParticle{
+    +OpenFile()
+    +CloseFile()
+    +WriteFile()
+    -Tree
+  }
+  class TMeshValue{
+    +OpenFile()
+    +CloseFile()
+    +WriteFile()
+    -Histograms
+  }
+}
+
+TConverter *-- TSDFReader
+TConverter *-- TMeshValue
+TConverter *-- TMacroParticle
+
+@enduml

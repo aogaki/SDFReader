@@ -1,0 +1,42 @@
+@startuml
+actor User
+
+User -> sdf2root : Input SDF file
+
+activate sdf2root
+sdf2root -> sdf2root: Open the SDF file
+
+sdf2root -> "SDF reader": SDF file
+activate "SDF reader"
+
+"SDF reader" -> "SDF reader": Check the header
+"SDF reader" -> sdf2root: Checking result
+
+sdf2root -> "ROOT writer": Open file request
+activate "ROOT writer"
+"ROOT writer" -> "ROOT writer": Open ROOT file
+
+sdf2root -> "SDF reader": Pre read block request
+
+"SDF reader" -> "SDF reader": Read each block
+"SDF reader" -> sdf2root: Finish
+
+loop for each block
+sdf2root -> "SDF reader": Read block data request
+loop for each element
+"SDF reader" -> "SDF reader": Read each element in the block
+"SDF reader" -> "ROOT writer": Values
+"ROOT writer" -> "ROOT writer": Fill the values
+end
+end
+
+sdf2root -> "ROOT writer": Close file request
+"ROOT writer" -> "ROOT writer": Close ROOT file
+
+sdf2root->sdf2root: Close SDF file
+deactivate "SDF reader"
+deactivate "ROOT writer"
+
+sdf2root -> User: Output ROOT file
+
+@enduml
