@@ -9,6 +9,7 @@ SDF2ROOTDict.cpp
 install_manifest.txt
 compile_commands.json
 sdf2root
+parTree
 Makefile
 *.root
 *.sdf

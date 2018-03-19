@@ -74,8 +74,11 @@ void TDataTree::AddLastFile()
 {
   // Now this function search from 0 to 9999.
   // If you want more.  Do the right thing!
+
+  auto errLevel = gErrorIgnoreLevel;
+  gErrorIgnoreLevel = kFatal;  // To stop file open error
   TString fileName = "";
-  for (Int_t i = 0; i < 10000; i++) {
+  for (auto i = 0; i < 10000; i++) {
     fileName = fDirectory + Form("%04d_", i) + fParName + ".root";
     TFile file(fileName);
 
@@ -87,6 +90,7 @@ void TDataTree::AddLastFile()
       file.Close();
     }
   }
+  gErrorIgnoreLevel = errLevel;  // To return default
 
   fLastFile = new TChain(fParName);
   fLastFile->Add(fileName);
