@@ -10,37 +10,34 @@
 #include <TFile.h>
 #include <TTree.h>
 
-#include "TSDFReader.hpp"
-#include "TBlockPlainMesh.hpp"
-#include "TMeshValue.hpp"
-#include "TMacroParticle.hpp"
 #include "RunMode.hpp"
-
+#include "TBlockPlainMesh.hpp"
+#include "TMacroParticle.hpp"
+#include "TMeshValue.hpp"
+#include "TSDFReader.hpp"
 
 class TConverter
 {
-public:
-   TConverter(TSDFReader *reader, TString outName, RunMode runMode);
-   ~TConverter();
+ public:
+  TConverter(TSDFReader *reader, TString outName, RunMode runMode);
+  ~TConverter();
 
-   void GetData();
-   
-private:
-   TSDFReader *fReader;
+  void GetData();
 
-   TString fOutName;
+ private:
+  TSDFReader *fReader;
 
-   RunMode fRunMode;
-   
-   // Particle values
-   std::vector<std::vector<TMacroParticle>> fMacroPar;
-   std::vector<TString> fParName;
-   TString fTargetName;
-   void FindPar();
-   void GetParGrid();
-   void GetParData();
+  TString fOutName;
+
+  RunMode fRunMode;
+
+  // Particle values
+  std::vector<TString> fParName;
+  void FindPar();
+
+  // For probe
+  std::vector<TString> fProbeName;
+  void FindProbe();
 };
 
-
 #endif
-

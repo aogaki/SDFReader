@@ -13,43 +13,41 @@ const Int_t kSDFRevision = 1;
 
 const Int_t kBlockTypeOffset = 56;
 
-
 class TSDFReader
 {
-public:
-   TSDFReader(TString fileName = "0300.sdf");
-   virtual ~TSDFReader();
+ public:
+  TSDFReader(TString fileName = "0300.sdf");
+  virtual ~TSDFReader();
 
-   Int_t GetNBlocks() {return fNBlocks;};
-   
-   TBlock *GetBlock(Int_t i){return fBlock[i];};
-   // dont use getter.  lazy code
-   std::vector<TBlock *> fBlock;
+  Int_t GetNBlocks() { return fNBlocks; };
 
-   TString GetFileName(){return fFileName;};
+  TBlock *GetBlock(Int_t i) { return fBlock[i]; };
+  std::vector<TBlock *> fBlock;
 
-   Int_t GetStep() {return fStep;};
-   Double_t GetTime() {return fTime;};
+  TString GetFileName() { return fFileName; };
 
-   Int_t GetBlockIndex(TString ID);
-   
-private:
-   void LoadBlocks();
-   Int_t GetNextBlockType();
-   
-   TString fFileName;
-   std::ifstream *fInputFile;
+  Int_t GetStep() { return fStep; };
+  Double_t GetTime() { return fTime; };
 
-   void ReadFileHeader();
-   Int_t fJobID1;
-   Int_t fJobID2;
-   Int_t fStringLength;
-   Int_t fBlockHeaderLength;
-   Long_t fNextBlockLocation; // seek position
-   Int_t fNBlocks;
+  Int_t GetBlockIndex(TString ID);
 
-   Int_t fStep;
-   Double_t fTime;
+ private:
+  void LoadBlocks();
+  Int_t GetNextBlockType();
+
+  TString fFileName;
+  std::ifstream *fInputFile;
+
+  void ReadFileHeader();
+  Int_t fJobID1;
+  Int_t fJobID2;
+  Int_t fStringLength;
+  Int_t fBlockHeaderLength;
+  Long_t fNextBlockLocation;  // seek position
+  Int_t fNBlocks;
+
+  Int_t fStep;
+  Double_t fTime;
 };
 
 // Constants for block, meta data and data
