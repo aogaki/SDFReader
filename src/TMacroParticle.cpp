@@ -80,48 +80,49 @@ void TMacroParticle::MakeTree()
   // Using similar name is not so good.  Block: fPx, Variable: Px.
   // Position
   Double_t x;
-  tree->Branch("x", &x, "x/D");
   Double_t y;
-  tree->Branch("y", &y, "y/D");
   Double_t z;
-  tree->Branch("z", &z, "z/D");
-
+  if (fGrid) {
+    tree->Branch("x", &x, "x/D");
+    tree->Branch("y", &y, "y/D");
+    tree->Branch("z", &z, "z/D");
+  }
   // Momentum
   Double_t Px;
-  tree->Branch("Px", &Px, "Px/D");
+  if (fPx) tree->Branch("Px", &Px, "Px/D");
   Double_t Py;
-  tree->Branch("Py", &Py, "Py/D");
+  if (fPy) tree->Branch("Py", &Py, "Py/D");
   Double_t Pz;
-  tree->Branch("Pz", &Pz, "Pz/D");
+  if (fPz) tree->Branch("Pz", &Pz, "Pz/D");
 
   // Velocity
   Double_t Vx;
-  tree->Branch("Vx", &Vx, "Vx/D");
+  if (fVx) tree->Branch("Vx", &Vx, "Vx/D");
   Double_t Vy;
-  tree->Branch("Vy", &Vy, "Vy/D");
+  if (fVy) tree->Branch("Vy", &Vy, "Vy/D");
   Double_t Vz;
-  tree->Branch("Vz", &Vz, "Vz/D");
+  if (fVz) tree->Branch("Vz", &Vz, "Vz/D");
 
   // Kinetic energy
   Double_t Ek;
-  tree->Branch("Ek", &Ek, "Ek/D");
+  if (fEk) tree->Branch("Ek", &Ek, "Ek/D");
 
   // Weight
   Double_t Weight;
-  tree->Branch("Weight", &Weight, "Weight/D");
+  if (fWeight) tree->Branch("Weight", &Weight, "Weight/D");
 
   // Optical depth
   Double_t optDep;
-  tree->Branch("OptDep", &optDep, "OptDep/D");
+  if (fOptDep) tree->Branch("OptDep", &optDep, "OptDep/D");
 
   // QED energy
   Double_t QEDEne;
-  tree->Branch("QEDEne", &QEDEne, "QEDEne/D");
+  if (fQEDEne) tree->Branch("QEDEne", &QEDEne, "QEDEne/D");
 
   // Particle ID
   // Don't use PARTICLE_ID4.
   Long64_t id;
-  tree->Branch("ID", &id, "ID/L");
+  if (fID) tree->Branch("ID", &id, "ID/L");
 
   const Long64_t kNoPar = fPx->GetDataSize();
   cout << kNoPar << endl;

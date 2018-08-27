@@ -11,7 +11,7 @@ using std::cout;
 using std::endl;
 
 TConverter::TConverter(TSDFReader *reader, TString outName, RunMode runMode)
-    : fReader(reader), fRunMode(runMode), fOutName(outName)
+    : fReader(reader), fOutName(outName), fRunMode(runMode)
 {
   FindPar();
   FindProbe();

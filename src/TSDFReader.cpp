@@ -181,9 +181,12 @@ Int_t TSDFReader::GetNextBlockType()
 Int_t TSDFReader::GetBlockIndex(TString ID)
 {
   ID.ToLower();
+  ID.ReplaceAll(" ", "");  // Sanitize.  I should do partial match searching?
   for (Int_t i = 0; i < GetNBlocks(); i++) {
     TString blockID = fBlock[i]->GetID();
     blockID.ToLower();
+    blockID.ReplaceAll(" ", "");  // Sanitize
+
     if (ID == blockID) return i;
   }
 
